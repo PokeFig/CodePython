@@ -34,8 +34,7 @@ if __name__ == "__main__":
 
     # Utilisation des modèles Odoo
     if models_proxy:
-        # Insérez ici votre logique pour utiliser les modèles Odoo
-        # par exemple, models_proxy.execute_kw(...)
+        
 
         # Fermeture de la connexion
         models_proxy.close()
