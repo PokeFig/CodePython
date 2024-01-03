@@ -76,23 +76,44 @@ def Product(models, db, uid, password):
 
 #===============================================================
         
+def Company(models, db, uid, password, company_name):
+    try:
+        # Recherche de la compagnie dans la table res.company
+        company_id = models.execute_kw(
+            db, uid, password,
+            'res.company', 'search', 
+            [[('name', '=', company_name)]]
+        )
+
+        if company_id:
+            company_data = models.execute_kw(
+                db, uid, password,
+                'res.company', 'read', [company_id[0]], {'fields': ['name', 'id']}
+            )
+
+            print(f"Nom de la compagnie : {company_data[0]['name']}")
+            print(f"Identifiant de la compagnie : {company_data[0]['id']}")
+        else:
+            print("Compagnie inexistante")
+
+    except Exception as e:
+        print(f"Erreur lors de la recherche de la compagnie : {e}")
+
+#============================================================================
+        
+
 if __name__ == "__main__":
 <<<<<<< HEAD
 =======
 
+    models 
     # Spécifiez le mot de passe ici si nécessaire
->>>>>>> 089f519bc2868453647764a5a88ab0a8b962f926
     mot_de_passe = "Ntm123456789!"
+    
+    # Connexion à Odoo
     models_proxy = Connect(password=mot_de_passe)
 
     # Utilisation des modèles Odoo
     if models_proxy:
-<<<<<<< HEAD
-        
-
-        # Fermeture de la connexion
-        models_proxy.close()
-=======
         # Utilisation de la fonction Product
         Product(models_proxy, "nom_de_votre_base_de_donnees", "uid_utilisateur", mot_de_passe)
->>>>>>> 089f519bc2868453647764a5a88ab0a8b962f926
