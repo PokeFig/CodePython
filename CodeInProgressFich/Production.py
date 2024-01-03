@@ -7,7 +7,6 @@ import xmlrpc.client
 
 #=================================================================
 
-
 def Connect(server_ip="172.31.10.65", server_port=8069, password="", database="PokeFigDataBase"):
     # Construction de l'URL de connexion Odoo
     url = f"http://{server_ip}:{server_port}/xmlrpc/2/common"
@@ -36,7 +35,16 @@ def Connect(server_ip="172.31.10.65", server_port=8069, password="", database="P
         print("Échec Connexion")
         return None
 
-if __name__ == "__main__":
+#=================================================================
     
+def Production()
+    
+#=================================================================
+
+if __name__ == "__main__":
+    # Spécifiez le mot de passe ici si nécessaire
     mot_de_passe = "Ntm123456789!"
+    
+    # Connexion à Odoo
     models_proxy = Connect(password=mot_de_passe)
+
