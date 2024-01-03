@@ -1,6 +1,6 @@
 import xmlrpc.client
 
-def Connect(server_ip="localhost", server_port=8069, password="", database="PokeFigDataBase"):
+def Connect(server_ip="192.168.201.2", server_port=8069, password="", database="PokeFigDataBase"):
     # Construction de l'URL de connexion Odoo
     url = f"http://{server_ip}:{server_port}/xmlrpc/2/common"
 
@@ -29,7 +29,7 @@ def Connect(server_ip="localhost", server_port=8069, password="", database="Poke
         return None
     
 
-    
+
 def Company(models, db, uid, password, company_name):
     try:
         # Recherche de la compagnie dans la table res.company
@@ -55,12 +55,12 @@ def Company(models, db, uid, password, company_name):
 
 
 if __name__ == "__main__":
+    # Spécifiez le mot de passe ici si nécessaire
     mot_de_passe = "Ntm123456789!"
+    
+    # Connexion à Odoo
     models_proxy = Connect(password=mot_de_passe)
 
-    # Utilisation des modèles Odoo
     if models_proxy:
-        
-
-        # Fermeture de la connexion
-        models_proxy.close()
+        # Utilisation de la fonction Company
+        Company(models_proxy, "PokeFigDataBase", "Nom", mot_de_passe, "UIMM")
