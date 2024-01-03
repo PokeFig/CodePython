@@ -27,6 +27,32 @@ def Connect(server_ip="localhost", server_port=8069, password="", database="Poke
         print(f"Erreur de connexion à Odoo : {e}")
         print("Échec Connexion")
         return None
+    
+
+    
+def Company(models, db, uid, password, company_name):
+    try:
+        # Recherche de la compagnie dans la table res.company
+        company_id = models.execute_kw(
+            db, uid, password,
+            'res.company', 'search', 
+            [[('name', '=', company_name)]]
+        )
+
+        if company_id:
+            company_data = models.execute_kw(
+                db, uid, password,
+                'res.company', 'read', [company_id[0]], {'fields': ['name', 'id']}
+            )
+
+            print(f"Nom de la compagnie : {company_data[0]['name']}")
+            print(f"Identifiant de la compagnie : {company_data[0]['id']}")
+        else:
+            print("Compagnie inexistante")
+
+    except Exception as e:
+        print(f"Erreur lors de la recherche de la compagnie : {e}")
+
 
 if __name__ == "__main__":
     mot_de_passe = "Ntm123456789!"
