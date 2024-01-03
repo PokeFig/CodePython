@@ -1,15 +1,26 @@
 import tkinter as tk
+import tkinter as ttk
 
 class PageAccueil(tk.Frame):
     def __init__(self, master, callback):
         super().__init__(master)
+
         self.master = master
         self.callback = callback
 
         tk.Label(self, text="Bienvenue sur la page d'accueil").pack(pady=10)
 
+        user = tk.StringVar()
+        pwd = tk.StringVar()
+        ttk.Label(self, text = "username:").pack()
+        ttk.Entry(self, textvariable=user).pack()
+        ttk.Label(self, text="password:").pack()
+        ttk.Entry(self, textvariable=pwd, show="*").pack()
+
         # Bouton pour passer à la page suivante
-        tk.Button(self, text="Afficher les détails", command=self.afficher_details).pack(pady=10)
+        ttk.Button(self, text="Login", command=self.afficher_details).pack()
+        
+
 
     def afficher_details(self):
         self.callback(PageDetails)
