@@ -7,6 +7,7 @@ class SharedData:
         self.user = tk.StringVar()
         self.pwd = tk.StringVar()
 
+#page de connexion
 class Pageconnect(tk.Frame):
     def __init__(self, master, callback, shared_data):
         super().__init__(master)
@@ -15,9 +16,15 @@ class Pageconnect(tk.Frame):
         self.callback = callback
         self.shared_data = shared_data
 
+        #création du groupe d'éléments
         content_frame = ttk.Frame(self)
 
-        tk.Label(self, text="PokeFig", font=('Times New Roman', 32, 'bold'), foreground="#F1A226").grid(row=2, column=0, padx=10, pady=(200,1))
+        image_path = "/home/user/Documents/clone/essai.png"
+        self.image = tk.PhotoImage(file=image_path)
+
+        # Créer un Label pour afficher l'image
+        tk.Label(self, image=self.image)
+        tk.Label(self, text="PokeFig", font=('Times New Roman', 32, 'bold'), foreground="#F1A226").grid(row=2, column=0, padx=10, pady=(1,1))
         tk.Label(self, text="Bienvenue sur la page de connexion", font=('Arial', 14)).grid(row=3, column=0, padx=10, pady=(0, 200))
 
         ttk.Label(content_frame, text="username:").grid(row=0, column=0, padx=10, pady=5)
