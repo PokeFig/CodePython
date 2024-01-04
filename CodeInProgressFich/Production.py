@@ -1,50 +1,24 @@
-#!/usr/bin/env python3
-#=================================================================
-# Interface ODOO avec l'API XML-RPC
-#=================================================================
+#######################################################################
+######                 Code Fonction Production                 #######
+#######################################################################
+#                                                                     #
+# Version 1.0                                                         #
+# Autor : B.A                                                         #
+#######################################################################
 
-import xmlrpc.client
-
-#=================================================================
-
-def Connect(server_ip="172.31.10.65", server_port=8069, password="", database="PokeFigDataBase"):
-    # Construction de l'URL de connexion Odoo
-    url = f"http://{server_ip}:{server_port}/xmlrpc/2/common"
-
+def Product(models, gUid, password, database):
     try:
-        # Connexion au serveur Odoo en utilisant XML-RPC
-        common_proxy = xmlrpc.client.ServerProxy(url)
-
-        # Authentification
-        uid = common_proxy.authenticate(database, "paimblancleo@gmail.com", password, {})
-
-        if uid:
-            print(f"Connecté à Odoo version {common_proxy.version()} à l'adresse : {url}")
-            print(f"Identifiant de l'utilisateur (uid) : {uid}")
-
-            # Récupération des modèles Odoo
-            models = xmlrpc.client.ServerProxy(f"http://{server_ip}:{server_port}/xmlrpc/2/object")
-            print("Connexion OK")
-            return models
-        else:
-            print("Échec de l'authentification. Vérifiez les informations d'identification.")
-            return None
-
+        product_ids = models.execute_kw("PokeFigDataBase", gUid, password,
+                                        'product.template', 'search_read',
+                                        [[]],
+                                        {'fields': ['id', 'name', 'list_price']})
+        return product_ids if product_ids else None
     except Exception as e:
-        print(f"Erreur de connexion à Odoo : {e}")
-        print("Échec Connexion")
+        print(f"Erreur lors de la recherche des produits : {e}")
         return None
 
-#=================================================================
-    
-def Production()
     
 #=================================================================
 
-if __name__ == "__main__":
-    # Spécifiez le mot de passe ici si nécessaire
-    mot_de_passe = "Ntm123456789!"
-    
-    # Connexion à Odoo
-    models_proxy = Connect(password=mot_de_passe)
 
+           
