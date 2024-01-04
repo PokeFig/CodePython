@@ -19,7 +19,8 @@ import xmlrpc.client
 EnterPassword = "Ntm123456789!"                                                                    #VARIABLE JARDEL POUR LE MOT DE PASSE
 EnterEmail = "BetaTest@gmail.com"                                                                  #VARIABLE JARDEL POUR MAIL OU IDENTIFIANT
 AuthentificationChek = False                                                                       #VARIABLE SI AUTHENTIFICATION CORRECTE
-ConnectionCheck = True                                                                             #VARAIBLE SI CONNEXION est correcte
+ConnectionCheck = True                                                                             #VARIABLE SI CONNEXION est correcte
+ProfilType = None                                                                                  #VARIABLE TYPE DE PROFIL
 
 #Gestion des identifiants serveurs
 server_ip = "172.31.10.65"                                                                         #IP de connection du serveur Odoo
@@ -28,6 +29,8 @@ data_base = "PokeFigDataBase"                                                   
 password = EnterPassword                                                                           #Gestion du mot de passe
 Email = EnterEmail                                                                                 #Gestion de l'identifiant
 url = f'http://{server_ip}:{server_port}'
+uid = None
+
 
 def ConnectionCheck():                                                                             #Fonction block check Connection serveur Odoo
     global AuthentificationChek
@@ -43,10 +46,6 @@ def ConnectionCheck():                                                          
             AuthentificationChek = True                                                            #Variable de confirmation de l'authentification
             print(f"Identifiant de l'utilisateur (uid) : {uid}")                                   #Retour d'information du profile
 
-            #if User:
-            #    User_Data = User[0]
-            #    User_groups = User_Data.get('groups_id',[])
-            # print("l'utilisateur fait partie du groupe {User_groups}")
 
         else:
             AuthentificationChek = False                                                           #Mise à faux de l'authentification
@@ -58,18 +57,43 @@ def ConnectionCheck():                                                          
         ConnectionCheck = False
         return None
 def getFields():                                                                                   #Fonction block pour avoir les autorisations
-    models = xmlrpc.client.ServerProxy('{}/xmlrpc/2/object'.format(url))                                        #connexion au modèle Odoo                                                       
-    acces = models.execute_kw(data_base, uid, password, 'mrp.production', 'check_access_rights', ['write'])                                               
-    print(f"Manufactoring order write acces rights :{acces}")
 
-    listing_acces = models.execute_kw(data_base, uid, password, 'mrp.production', 'fields_get', [], {'attributes': []})
-    for attr in listing_acces:
-        print(f'-{attr}')
-    else:
-        print(f'Odoo server authentification rejected : DB = {data_base} User ={uid}')
-#def AiguillageFields():
+    global listing_acces
+    models = xmlrpc.client.ServerProxy('{}/xmlrpc/2/object'.format(url))                           #Connection au serveur
+    try:                                                                                            
+        acces = models.execute_kw(data_base, uid, password, 'mrp.production', 'check_access_rights', ['write'])                                               
+        print(f"Manufactoring order write acces rights :{acces}")
+        if uid == 2 :
+            ProfilType = 'administrateur'
+            print(f"Profil administrateur")
+        else:
+            ProfilType = 'production'
+            print(f"Profil production")
 
+    except:
+        print(f"Profil logistique")  
+        ProfilType = 'logistique'
+
+    #listing_acces = models.execute_kw(data_base, uid, password, 'mrp.production', 'fields_get', [], {'attributes': []})
+    #for attr in listing_acces:
+        #print(f'-{attr}')
+    #else:
+        #print(f'Odoo server authentification rejected : DB = {data_base} User ={uid}')
+
+def AiguillageFields():
+
+    if listing_acces is not None:
+        for attr in listing_acces:
+            if 'product_id' in str(attr):
+                print(f"Nom trouvé Production")
+                ProfilType = 'Production'
+                return True
+            
+    print(f"Nom  non trouvé")
+    ProfilType = 'logistique'
+    return False
 
 if __name__ == "__main__":
  ConnectionCheck()
  getFields()
+ #AiguillageFields()
