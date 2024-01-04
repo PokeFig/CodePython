@@ -16,7 +16,7 @@ def Connect(server_ip="172.31.10.65", server_port=8069, password="Ntm123456789!"
 
     try:
         
-        common_proxy = xmlrpc.client.ServerProxy(gUrl,allow_none=True)                                               #Connexion au serveur Odoo en utilisant XML-RPC
+        common_proxy = xmlrpc.client.ServerProxy(gUrl)                                                               #Connexion au serveur Odoo en utilisant XML-RPC
         gUid = common_proxy.authenticate("PokeFigDataBase", "paimblancleo@gmail.com", password, {})                  #Authentification
 
         if gUid:
