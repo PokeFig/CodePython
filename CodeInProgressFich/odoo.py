@@ -1,16 +1,14 @@
-#!/usr/bin/env python3
-#=================================================================
-# Interface ODOO avec l'API XML-RPC
-#=================================================================
+#######################################################################
+######                 Programme connexion a DBB                #######
+#######################################################################
+#                                                                     #
+# Version 1.0                                                         #
+# Autor : B.A                                                         #
+#######################################################################
 
+#======================================================================
 import xmlrpc.client
-
-gUid = None
-gUrl = None
-password = "Ntm123456789!"
-database = "PokeFigDataBase"
-
-#=================================================================
+#======================================================================
 
 def Connect(server_ip="172.31.10.65", server_port=8069, password="Ntm123456789!"):                                   #Définition de l'accès a la odoo
 
@@ -19,7 +17,7 @@ def Connect(server_ip="172.31.10.65", server_port=8069, password="Ntm123456789!"
     try:
         
         common_proxy = xmlrpc.client.ServerProxy(gUrl,allow_none=True)                                               #Connexion au serveur Odoo en utilisant XML-RPC
-        gUid = common_proxy.authenticate(database, "paimblancleo@gmail.com", password, {})                           #Authentification
+        gUid = common_proxy.authenticate("PokeFigDataBase", "paimblancleo@gmail.com", password, {})                  #Authentification
 
         if gUid:
             print(f"Connecté à Odoo version {common_proxy.version()} à l'adresse : {gUrl}")                          #Ecriture dans la console
@@ -36,5 +34,5 @@ def Connect(server_ip="172.31.10.65", server_port=8069, password="Ntm123456789!"
         print(f"Erreur de connexion à Odoo : {e}")                                                                   #Ecriture dans la console si echèc de l'authentification
         print("Échec Connexion")
         return None
-    
-#=================================================================
+
+#======================================================================
