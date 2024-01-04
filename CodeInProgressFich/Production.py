@@ -6,9 +6,10 @@
 # Autor : B.A                                                         #
 #######################################################################
 
+#======================================================================
 def Product(models, gUid, password, database):
     try:
-        product_ids = models.execute_kw("PokeFigDataBase", gUid, password,
+        product_ids = models.execute_kw( database, gUid, password,
                                         'product.template', 'search_read',
                                         [[]],
                                         {'fields': ['id', 'name', 'list_price']})
@@ -17,8 +18,8 @@ def Product(models, gUid, password, database):
         print(f"Erreur lors de la recherche des produits : {e}")
         return None
 
-    
-#=================================================================
+#----------------------------------------------------------------------
 
+#def SaveProductImage( models, db, uid, password, product_id, image_name):
 
-           
+#----------------------------------------------------------------------         
