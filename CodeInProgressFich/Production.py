@@ -9,6 +9,7 @@
 
 import base64
 
+
 #======================================================================
 
 def Product(models, gUid, password, database):
@@ -24,11 +25,11 @@ def Product(models, gUid, password, database):
 
 #----------------------------------------------------------------------
 
-def SaveProductImage( models, database, uid, password, product_id, image_name):
+def SaveProductImage(models, db, uid, password, product_id, image_name):
     try:
         # Récupérer le produit avec l'identifiant product_id
         product = models.execute_kw(
-            database, uid, password,
+            db, uid, password,
             'product.template', 'read',
             [product_id],
             {'fields': ['image_1920']}
@@ -48,5 +49,6 @@ def SaveProductImage( models, database, uid, password, product_id, image_name):
 
     except Exception as e:
         print(f"Erreur lors de la sauvegarde de l'image : {e}")
+
 
 #----------------------------------------------------------------------         

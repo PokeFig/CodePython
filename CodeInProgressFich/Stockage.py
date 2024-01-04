@@ -1,20 +1,13 @@
 #######################################################################
-######                 Code Login odoo + profile                #######
+######                 Code page Stockage                       #######
 #######################################################################
 #                                                                     #
 # Version 1.0                                                         #
 # Autor : B.A                                                         #
 #######################################################################
-
-#################################################
-# Vérification de la bonne connection Prog/odoo #
-#################################################
-
-#==========================================================
-# Fonction Block Connexion
-#==========================================================
-
 import xmlrpc.client
+import CodeLogin
+import base64
 
 EnterPassword = "Ntm123456789!"                                                                    #VARIABLE JARDEL POUR LE MOT DE PASSE
 EnterEmail = "BetaTest@gmail.com"                                                                  #VARIABLE JARDEL POUR MAIL OU IDENTIFIANT
@@ -58,8 +51,8 @@ def ConnectionCheck():                                                          
         return None
 
 def getFields():                                                                                   #Fonction block pour avoir les autorisations
+    global models
 
-    global listing_acces
     models = xmlrpc.client.ServerProxy('{}/xmlrpc/2/object'.format(url))                           #Connection au serveur
     try:                                                                                            
         acces = models.execute_kw(data_base, uid, password, 'mrp.production', 'check_access_rights', ['write'])                                               
@@ -102,3 +95,31 @@ if __name__ == "__main__":
  ConnectionCheck()
  getFields()
  #AiguillageFields()
+
+
+#########################################################################################################################
+#==========================================================
+# Fonction Block Connexion
+#==========================================================
+
+import CodeLogin
+import base64
+
+def Product():
+
+    try:
+        product_ids = models.execute_kw( data_base, uid, password,
+                                        'product.template', 'search_read',
+                                        [[]],
+                                        {'fields': ['id', 'name', 'list_price']})
+        return product_ids if product_ids else None
+    
+    except Exception as e:
+        print(f"Erreur lors de la recherche des produits : {e}")
+        return None
+
+#==========================================================
+# Main
+#==========================================================
+    
+Production = Product()
