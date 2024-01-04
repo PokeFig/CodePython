@@ -9,6 +9,7 @@
 
 import base64
 
+
 #======================================================================
 
 def Product(models, gUid, password, database):
@@ -35,18 +36,19 @@ def SaveProductImage(models, db, uid, password, product_id, image_name):
         )
 
         if product and product[0].get('image_1920'):
-            image_data = base64.b64decode(product[0]['image_1920'])
-            with open(image_name + '.png', 'wb') as file:
-                file.write(image_data)
-            print(f"L'image du produit avec l'ID {product_id} a été sauvegardée sous {image_name}.png")
-            return True
+            # Convertir la chaîne d'image base64 en bytes
+            image_bytes = base64.b64decode(product[0]['image_1920'])
+
+            # Sauvegarder l'image au format '.png' sur le disque
+            with open(image_name, 'wb') as f:
+                f.write(image_bytes)
+
+            print(f"L'image du produit avec l'ID {product_id} a été sauvegardée dans {image_name}")
         else:
-            print(f"Le produit avec l'ID {product_id} n'a pas d'image.")
-            return False
+            print(f"Aucune image trouvée pour le produit avec l'ID {product_id}")
 
     except Exception as e:
-        print(f"Erreur lors de la sauvegarde de l'image du produit : {e}")
-        return False
+        print(f"Erreur lors de la sauvegarde de l'image : {e}")
 
 
 #----------------------------------------------------------------------         
