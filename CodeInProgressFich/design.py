@@ -1,11 +1,13 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 
+
 class SharedData:
     def __init__(self):
         self.user = tk.StringVar()
         self.pwd = tk.StringVar()
 
+#page de connexion
 class Pageconnect(tk.Frame):
     def __init__(self, master, callback, shared_data):
         super().__init__(master)
@@ -14,15 +16,28 @@ class Pageconnect(tk.Frame):
         self.callback = callback
         self.shared_data = shared_data
 
-        tk.Label(self, text="Bienvenue sur la page de connexion").pack(pady=10)
+        #création du groupe d'éléments
+        content_frame = ttk.Frame(self)
 
-        ttk.Label(self, text="username:").pack()
-        ttk.Entry(self, textvariable=self.shared_data.user).pack()
-        ttk.Label(self, text="password:").pack()
-        ttk.Entry(self, textvariable=self.shared_data.pwd, show="*").pack()
+        image_path = "/home/user/Documents/clone/essai.png"
+        self.image = tk.PhotoImage(file=image_path)
+
+        # Créer un Label pour afficher l'image
+        tk.Label(self, image=self.image)
+        tk.Label(self, text="PokeFig", font=('Times New Roman', 32, 'bold'), foreground="#F1A226").grid(row=2, column=0, padx=10, pady=(1,1))
+        tk.Label(self, text="Bienvenue sur la page de connexion", font=('Arial', 14)).grid(row=3, column=0, padx=10, pady=(0, 200))
+
+        ttk.Label(content_frame, text="username:").grid(row=0, column=0, padx=10, pady=5)
+        ttk.Entry(content_frame, textvariable=self.shared_data.user).grid(row=0, column=1, padx=10, pady=5)
+
+        ttk.Label(content_frame, text="password:").grid(row=1, column=0, padx=10, pady=5)
+        ttk.Entry(content_frame, textvariable=self.shared_data.pwd, show="*").grid(row=1, column=1, padx=10, pady=5)
 
         # Bouton pour passer à la page suivante
-        ttk.Button(self, text="Login", command=self.afficher_boutons_pages).pack()
+        ttk.Button(content_frame, text="Login", command=self.afficher_boutons_pages).grid(row=2, column=0, columnspan=2, pady=10)
+
+        content_frame.grid(row=1, column=1, rowspan=4, padx=100)
+
 
     def afficher_boutons_pages(self):
         username = self.shared_data.user.get()
