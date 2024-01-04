@@ -56,6 +56,7 @@ def ConnectionCheck():                                                          
         print("Échec Connexion")
         ConnectionCheck = False
         return None
+
 def getFields():                                                                                   #Fonction block pour avoir les autorisations
 
     global listing_acces
@@ -92,6 +93,10 @@ def AiguillageFields():
     print(f"Nom  non trouvé")
     ProfilType = 'logistique'
     return False
+#==========================================================
+# Main
+#==========================================================
+
 
 if __name__ == "__main__":
  ConnectionCheck()
