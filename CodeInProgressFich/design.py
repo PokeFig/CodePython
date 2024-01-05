@@ -1,5 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
+import CodeLogin
+
 
 
 class SharedData:
@@ -33,6 +35,7 @@ class Pageconnect(tk.Frame):
 
         ttk.Label(content_frame, text="password:").grid(row=1, column=0, padx=10, pady=5)
         ttk.Entry(content_frame, textvariable=self.shared_data.pwd, show="*").grid(row=1, column=1, padx=10, pady=5)
+        
 
         # Bouton pour passer à la page suivante
         ttk.Button(content_frame, text="Login", command=self.afficher_boutons_pages).grid(row=2, column=0, columnspan=2, pady=10)
