@@ -14,6 +14,7 @@ gUid = None
 gUrl = None
 password = "Ntm123456789!"
 database = "PokeFigDataBase"
+global models
 #======================================================================
 
 def Product(models, gUid, password, database):

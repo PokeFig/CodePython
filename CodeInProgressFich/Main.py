@@ -42,6 +42,6 @@ if __name__ == "__main__":
             for product in products:                                                                                                  # Boucle pour écriture la liste dans la console
                 print(f"ID: {product.get('id')}")
 
-getManufOrderToDo())
+getManufOrderToDo()
 
 #======================================================================
