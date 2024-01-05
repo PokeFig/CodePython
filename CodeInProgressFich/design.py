@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import subprocess
+import CodeLoginJardel
 
 
 class SharedData:
@@ -46,11 +47,13 @@ class Pageconnect(tk.Frame):
         username = self.shared_data.user.get()
         password = self.shared_data.pwd.get()
 
-        if username == "Prod" and password == "trust":
+        prof = CodeLoginJardel.ProfilType
+
+        if prof == "production":
             self.callback(PageProduction, self.shared_data)
-        elif username == "Logic" and password == "trust":
+        elif prof == "logistique":
             self.callback(PageLogistique, self.shared_data)
-        elif username == "Mister-J23" and password == "trust":
+        elif prof == "administrateur":
             ttk.Button(self, text="Production", command=self.go_prod).pack()
             ttk.Button(self, text="Logistique", command=self.go_logic).pack()
             ttk.Button(self, text="Administrateur", command=self.go_Admin).pack()
@@ -58,7 +61,7 @@ class Pageconnect(tk.Frame):
             messagebox.showinfo(
                 message=f'!!!Aucun droit!!!'
             )
-        subprocess.run(["python3", "CodeLoginJardel.py"])
+        subprocess.run(["python3", "/home/user/Documents/clone/CodePython/CodeInProgressFich/CodeLoginJardel.py"])
 
     def go_prod(self):
         self.callback(PageProduction, self.shared_data)
