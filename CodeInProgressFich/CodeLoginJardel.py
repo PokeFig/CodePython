@@ -16,7 +16,8 @@
 
 import xmlrpc.client
 import design
-from design import SharedData, Pageconnect
+from design import Pageconnect
+
 
 EnterPassword = Pageconnect.shared_data.pwd.get()#"Ntm123456789!"                                                                    #VARIABLE JARDEL POUR LE MOT DE PASSE
 EnterEmail = Pageconnect.shared_data.user.get()#"BetaTest@gmail.com"                                                                  #VARIABLE JARDEL POUR MAIL OU IDENTIFIANT
