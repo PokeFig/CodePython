@@ -65,7 +65,7 @@ def getManufOrderToDo(models,limit=10):
     mo_list = []  # Initialisation avec une liste vide
 
     try:
-        result = models_proxy.execute_kw(database, gUid, 'mrp.production', 'search_read',
+        result = models.execute_kw(database, gUid, 'mrp.production', 'search_read',
                                          [domain], {'fields': fields, 'limit': limit})
 
         if result is not None:
