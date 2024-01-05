@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-import CodeLogin
-
+import CodeLoginJardel
 
 
 class SharedData:
@@ -20,7 +19,6 @@ class Pageconnect(tk.Frame):
 
         #création du groupe d'éléments
         content_frame = ttk.Frame(self)
-
         
         image_path = "CodePython/CodeInProgressFich/poke.png"
         self.image = tk.PhotoImage(file=image_path)
