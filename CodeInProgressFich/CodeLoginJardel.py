@@ -15,12 +15,14 @@
 #==========================================================
 
 import xmlrpc.client
+import design
+from design import SharedData, Pageconnect
 
-EnterPassword =  "Ntm123456789!"                                                                    #VARIABLE JARDEL POUR LE MOT DE PASSE
-EnterEmail = "BetaTest@gmail.com"                                                                  #VARIABLE JARDEL POUR MAIL OU IDENTIFIANT
+EnterPassword = Pageconnect.shared_data.pwd.get()#"Ntm123456789!"                                                                    #VARIABLE JARDEL POUR LE MOT DE PASSE
+EnterEmail = Pageconnect.shared_data.user.get()#"BetaTest@gmail.com"                                                                  #VARIABLE JARDEL POUR MAIL OU IDENTIFIANT
 AuthentificationChek = False                                                                       #VARIABLE SI AUTHENTIFICATION CORRECTE
 ConnectionCheck = True                                                                             #VARIABLE SI CONNEXION est correcte
-ProfilType = None                                                                                  #VARIABLE TYPE DE PROFIL
+ProfilType = None                                                                                  #VARIABLE TYPE DE PROFIL 
 
 #Gestion des identifiants serveurs
 server_ip = "172.31.10.65"                                                                         #IP de connection du serveur Odoo
