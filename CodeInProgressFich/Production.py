@@ -9,7 +9,7 @@
 
 import base64
 
-global models
+
 gUid = None
 gUrl = None
 password = "Ntm123456789!"
@@ -56,8 +56,8 @@ def SaveProductImage(models, db, uid, password, product_id, image_name):
 
 #----------------------------------------------------------------------
     
-def getManufOrderToDo(limit=10):
-    
+def getManufOrderToDo(models,limit=10):
+
     domain = [('state', '=', 'confirmed'), ('qty_produced', '!=', 'product_qty')]
     fields = ['name', 'date_planned_start', 'product_id', 'product_qty', 'qty_producing', 'state']
     limit = 10
