@@ -56,7 +56,7 @@ def SaveProductImage(models, db, uid, password, product_id, image_name):
 
 #----------------------------------------------------------------------
     
-def getManufOrderToDo(models,limit=10):
+def getManufOrderToDo(limit=10):
 
     domain = [('state', '=', 'confirmed'), ('qty_produced', '!=', 'product_qty')]
     fields = ['name', 'date_planned_start', 'product_id', 'product_qty', 'qty_producing', 'state']
