@@ -57,17 +57,22 @@ def SaveProductImage(models, db, uid, password, product_id, image_name):
 
 #----------------------------------------------------------------------
     
-def getManufOrderToDo(models,limit=10):
-
-    fields =['name', 'date_planned_start', 'product_id', 'product_qty', 'qty_producing', 'state']
+def getManufOrderToDo(models, limit=10):
+    fields = ['name', 'date_planned_start', 'product_id', 'product_qty', 'qty_producing', 'state']
     limit = 10
-    mo_list = models.execute_kw(database, gUid,
-    'mrp.production', 'search_read',
-    [[('state', '=', 'confirmed'), ('qty_produced', '!=', 'product_qty')]], 
-    {'fields': fields, 'limit': limit})
-    for mo_dico in mo_list:
-     print(f'----------------------------')
-    for k in mo_dico.keys():
-     print(f' - {k} : {mo_dico[k]}')
+    mo_list = models.execute_kw(
+        database, gUid,
+        'mrp.production', 'search_read',
+        [[('state', '=', 'confirmed'), ('qty_produced', '!=', 'product_qty')]],
+        {'fields': fields, 'limit': limit},
+        allow_none=True
+    )
 
-#----------------------------------------------------------------------
+    if mo_list:
+        for mo_dico in mo_list:
+            print(f'----------------------------')
+            for k in mo_dico.keys():
+                print(f' - {k} : {mo_dico[k]}')
+    else:
+        print("Aucun ordre de fabrication trouvé ou une erreur est survenue.")
+--------------------------------------------------------------------
