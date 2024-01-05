@@ -28,7 +28,8 @@ def Product(models, gUid, password, database):
         print(f"Erreur lors de la recherche des produits : {e}")
         return None
 
-#----------------------------------------------------------------------
+#---rom Production import SaveProductImage
+#-------------------------------------------------------------------
 
 def SaveProductImage(models, db, uid, password, product_id, image_name):
     try:
