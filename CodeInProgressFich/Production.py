@@ -14,6 +14,7 @@ gUid = None
 gUrl = None
 password = "Ntm123456789!"
 database = "PokeFigDataBase"
+
 #======================================================================
 
 def Product(models, gUid, password, database):
@@ -56,8 +57,10 @@ def SaveProductImage(models, db, uid, password, product_id, image_name):
 
 #----------------------------------------------------------------------
     
-def getManufOrderToDo(models,limit=10):
+def getManufOrderToDo(limit=10):
 
+    models = ""
+    
     domain = [('state', '=', 'confirmed'), ('qty_produced', '!=', 'product_qty')]
     fields = ['name', 'date_planned_start', 'product_id', 'product_qty', 'qty_producing', 'state']
     limit = 10
