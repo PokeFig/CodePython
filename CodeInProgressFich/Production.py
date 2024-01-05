@@ -40,10 +40,10 @@ def SaveProductImage(models, db, uid, password, product_id, image_name):
             image_bytes = base64.b64decode(product[0]['image_1920'])
 
             # Sauvegarder l'image au format '.png' sur le disque
-            with open(image_name, 'wb') as f:
-                f.write(image_bytes)
+            with open(image_name + '.png', 'wb') as file:
+                file.write(image_bytes)
 
-            print(f"L'image du produit avec l'ID {product_id} a été sauvegardée dans {image_name}")
+            print(f"L'image du produit avec l'ID {product_id} a été sauvegardée dans {image_name}.png")
         else:
             print(f"Aucune image trouvée pour le produit avec l'ID {product_id}")
 
