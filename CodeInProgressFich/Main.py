@@ -16,6 +16,7 @@ from Production import Product
 from Production import SaveProductImage
 from Production import getManufOrderToDo
 
+models_proxy = Connect(server_ip="172.31.10.65", server_port=8069, password="Ntm123456789!")
 
 #======================================================================
 #Déclaration de varaibles global
@@ -28,8 +29,6 @@ database = "PokeFigDataBase"
 
 #======================================================================
 if __name__ == "__main__":
-    
-    models_proxy = Connect(server_ip="172.31.10.65", server_port=8069, password="Ntm123456789!")
 
     if models_proxy:
 
@@ -42,6 +41,6 @@ if __name__ == "__main__":
             for product in products:                                                                                                  # Boucle pour écriture la liste dans la console
                 print(f"ID: {product.get('id')}")
 
-getManufOrderToDo()
+getManufOrderToDo(models_proxy)
 
 #======================================================================
