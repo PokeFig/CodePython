@@ -10,6 +10,10 @@
 import base64
 
 
+gUid = None
+gUrl = None
+password = "Ntm123456789!"
+database = "PokeFigDataBase"
 #======================================================================
 
 def Product(models, gUid, password, database):
@@ -17,7 +21,7 @@ def Product(models, gUid, password, database):
         product_ids = models.execute_kw( database, gUid, password,
                                         'product.template', 'search_read',
                                         [[]],
-                                        {'fields': ['id', 'name', 'list_price']})
+                                        {'fields': ['id']})
         return product_ids if product_ids else None
     except Exception as e:
         print(f"Erreur lors de la recherche des produits : {e}")
@@ -50,5 +54,20 @@ def SaveProductImage(models, db, uid, password, product_id, image_name):
     except Exception as e:
         print(f"Erreur lors de la sauvegarde de l'image : {e}")
 
+#----------------------------------------------------------------------
+    
+def getManufOrderToDo(models,limit=10):
 
-#----------------------------------------------------------------------         
+    domain = [('state', '=', 'confirmed'), ('qty_produced', '!=', 'product_qty')]
+    fields = ['name', 'date_planned_start', 'product_id', 'product_qty', 'qty_producing', 'state']
+    limit = 10
+    
+    mo_list = models.execute_kw(database, gUid, 'mrp.production', 'search_read',
+                                [domain], {'fields': fields, 'limit': limit})
+
+    for mo_dico in mo_list:
+        print(f'----------------------------')
+        for k in mo_dico.keys():
+            print(f' - {k} : {mo_dico[k]}')
+
+#----------------------------------------------------------------------
