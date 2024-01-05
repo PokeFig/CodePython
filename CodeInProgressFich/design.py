@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-import CodeLoginJardel
+import subprocess
 
 
 class SharedData:
@@ -58,6 +58,7 @@ class Pageconnect(tk.Frame):
             messagebox.showinfo(
                 message=f'!!!Aucun droit!!!'
             )
+        subprocess.run(["python3", "CodeLoginJardel.py"])
 
     def go_prod(self):
         self.callback(PageProduction, self.shared_data)
