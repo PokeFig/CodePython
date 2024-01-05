@@ -29,7 +29,7 @@ def ConnectionCheck():                                                          
     global AuthentificationChek
     global uid
 
-    urlOdoo = f"http://{server_ip}:{server_port}/xmlrpc/2/common"                                 #Génération du lien pour la connection de Odoo
+    urlOdoo = f"http://{server_ip}:{server_port}/xmlrpc/2/common"                                  #Génération du lien pour la connection de Odoo
     try:
         common_proxy = xmlrpc.client.ServerProxy(urlOdoo)                                          #Connection au serveur avec le lien
         uid = common_proxy.authenticate(data_base, Email, password, {})                            #Connection au profile
@@ -86,15 +86,6 @@ def AiguillageFields():
     print(f"Nom  non trouvé")
     ProfilType = 'logistique'
     return False
-#==========================================================
-# Main
-#==========================================================
-
-
-if __name__ == "__main__":
- ConnectionCheck()
- getFields()
- #AiguillageFields()
 
 
 #########################################################################################################################
@@ -105,21 +96,47 @@ if __name__ == "__main__":
 import CodeLogin
 import base64
 
-def Product():
+def Stock():
 
     try:
-        product_ids = models.execute_kw( data_base, uid, password,
-                                        'product.template', 'search_read',
+        Stock_ids = models.execute_kw(data_base, uid, password,
+                                        'stock.quant', 'search_read',
                                         [[]],
-                                        {'fields': ['id', 'name', 'list_price']})
-        return product_ids if product_ids else None
-    
+                                        {'fields': ['location_id','quantity']})
+        return Stock_ids if Stock_ids else None
+
+
     except Exception as e:
         print(f"Erreur lors de la recherche des produits : {e}")
         return None
 
+def product():
+   
+    try:
+        product_ids = models.execute_kw( data_base, uid, password,
+                                        'product.template', 'search_read',
+                                        [[]],
+                                        {'fields': ['id', 'name', 'list_price','default_code']})
+        return product_ids if product_ids else None
+   
+    except Exception as e:
+        print(f"Erreur lors de la recherche des produits : {e}")
+        return None
+     
 #==========================================================
 # Main
 #==========================================================
-    
-Production = Product()
+if __name__ == "__main__":
+    ConnectionCheck()
+    getFields()  
+    ListingStock = Stock()
+    ListingProduction = product()
+
+    if ListingStock and ListingProduction:
+
+            for ListingStock in ListingStock:                                                                    # Boucle pour écriture la liste dans la console
+                print(f"ID: {ListingStock.get('location_id')}, Quantity: {ListingStock.get('quantity')}")
+            
+            for ListingProduction in ListingProduction:                                                          # Boucle pour écriture la liste dans la console
+                print(f"ID: {ListingProduction.get('id')}, Nom: {ListingProduction.get('name')}, Prix: {ListingProduction.get('default_code')}",)
+            
