@@ -59,28 +59,15 @@ def SaveProductImage(models, db, uid, password, product_id, image_name):
     
 def getManufOrderToDo(models,limit=10):
 
-    domain = [('state', '=', 'confirmed'), ('qty_produced', '!=', 'product_qty')]
-    fields = ['name', 'date_planned_start', 'product_id', 'product_qty', 'qty_producing', 'state']
+    fields =['name', 'date_planned_start', 'product_id', 'product_qty', 'qty_producing', 'state']
     limit = 10
-    mo_list = []  # Initialisation avec une liste vide
-
-    try:
-        result = models.execute_kw(database, gUid, 'mrp.production', 'search_read',
-                                         [domain], {'fields': fields, 'limit': limit})
-
-        if result is not None:
-            mo_list = result
-
-    except Exception as e:
-        print(f"Erreur lors de la récupération des ordres de fabrication : {e}")
-
-    if mo_list:
-        for mo_dico in mo_list:
-            print(f'----------------------------')
-            for k in mo_dico.keys():
-                print(f' - {k} : {mo_dico[k]}')
-    else:
-        print("Aucun ordre de fabrication trouvé ou une erreur est survenue.")
-
+    mo_list = models.execute_kw(database, gUid,
+    'mrp.production', 'search_read',
+    [[('state', '=', 'confirmed'), ('qty_produced', '!=', 'product_qty')]], 
+    {'fields': fields, 'limit': limit})
+    for mo_dico in mo_list:
+     print(f'----------------------------')
+    for k in mo_dico.keys():
+     print(f' - {k} : {mo_dico[k]}')
 
 #----------------------------------------------------------------------
