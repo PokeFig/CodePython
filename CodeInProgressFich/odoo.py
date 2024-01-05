@@ -32,7 +32,6 @@ def Connect(server_ip="172.31.10.65", server_port=8069, password="Ntm123456789!"
 
     except Exception as e:
         print(f"Erreur de connexion à Odoo : {e}")                                                                   #Ecriture dans la console si echèc de l'authentification
-        print("Échec Connexion")
         return None
 
 #======================================================================
