@@ -22,7 +22,7 @@ def Product(models, gUid, password, database):
         product_ids = models.execute_kw( database, gUid, password,
                                         'product.template', 'search_read',
                                         [[]],
-                                        {'fields': ['id']})
+                                        {'fields': ['default_code']})
         return product_ids if product_ids else None
     except Exception as e:
         print(f"Erreur lors de la recherche des produits : {e}")
@@ -62,8 +62,8 @@ def getManufOrderToDo(models,limit=10):
     domain = [('state', '=', 'confirmed'), ('qty_produced', '!=', 'product_qty')]
     fields = ['name', 'date_planned_start', 'product_id', 'product_qty', 'qty_producing', 'state']
     limit = 10
-    
-    mo_list = models.execute_kw(database, gUid, 'mrp.production', 'search_read',
+    if gUid:
+        mo_list = models.execute_kw(database, gUid, 'mrp.production', 'search_read',
                                 [domain], {'fields': fields, 'limit': limit})
 
     for mo_dico in mo_list:
