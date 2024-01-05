@@ -1,5 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
+import subprocess
+import CodeLoginJardel
 
 
 class SharedData:
@@ -10,7 +12,7 @@ class SharedData:
 #page de connexion
 class Pageconnect(tk.Frame):
     def __init__(self, master, callback, shared_data):
-        super().__init__(master)
+        super().__init__(master, background="#33c4ff")
 
         self.master = master
         self.callback = callback
@@ -18,20 +20,21 @@ class Pageconnect(tk.Frame):
 
         #création du groupe d'éléments
         content_frame = ttk.Frame(self)
-
-        image_path = "/home/user/Documents/clone/essai.png"
+        
+        image_path = "CodePython/CodeInProgressFich/poke.png"
         self.image = tk.PhotoImage(file=image_path)
 
         # Créer un Label pour afficher l'image
-        tk.Label(self, image=self.image)
-        tk.Label(self, text="PokeFig", font=('Times New Roman', 32, 'bold'), foreground="#F1A226").grid(row=2, column=0, padx=10, pady=(1,1))
-        tk.Label(self, text="Bienvenue sur la page de connexion", font=('Arial', 14)).grid(row=3, column=0, padx=10, pady=(0, 200))
+        image_label = tk.Label(self, image=self.image, background="#33c4ff").grid(row=1, column=0, padx=10, pady=(20,1))
+        tk.Label(self, text="PokeFig", font=('Times New Roman', 32, 'bold'), foreground="#F1A226", background="#33c4ff").grid(row=2, column=0, padx=10, pady=(1,1))
+        tk.Label(self, text="Bienvenue sur la page de connexion", font=('Arial', 14), background="#33c4ff").grid(row=3, column=0, padx=10, pady=(0, 200))
 
         ttk.Label(content_frame, text="username:").grid(row=0, column=0, padx=10, pady=5)
         ttk.Entry(content_frame, textvariable=self.shared_data.user).grid(row=0, column=1, padx=10, pady=5)
 
         ttk.Label(content_frame, text="password:").grid(row=1, column=0, padx=10, pady=5)
         ttk.Entry(content_frame, textvariable=self.shared_data.pwd, show="*").grid(row=1, column=1, padx=10, pady=5)
+        
 
         # Bouton pour passer à la page suivante
         ttk.Button(content_frame, text="Login", command=self.afficher_boutons_pages).grid(row=2, column=0, columnspan=2, pady=10)
@@ -39,15 +42,18 @@ class Pageconnect(tk.Frame):
         content_frame.grid(row=1, column=1, rowspan=4, padx=100)
 
 
+
     def afficher_boutons_pages(self):
         username = self.shared_data.user.get()
         password = self.shared_data.pwd.get()
 
-        if username == "Prod" and password == "trust":
+        prof = CodeLoginJardel.ProfilType
+
+        if prof == "production":
             self.callback(PageProduction, self.shared_data)
-        elif username == "Logic" and password == "trust":
+        elif prof == "logistique":
             self.callback(PageLogistique, self.shared_data)
-        elif username == "Mister-J23" and password == "trust":
+        elif prof == "administrateur":
             ttk.Button(self, text="Production", command=self.go_prod).pack()
             ttk.Button(self, text="Logistique", command=self.go_logic).pack()
             ttk.Button(self, text="Administrateur", command=self.go_Admin).pack()
@@ -55,6 +61,7 @@ class Pageconnect(tk.Frame):
             messagebox.showinfo(
                 message=f'!!!Aucun droit!!!'
             )
+        subprocess.run(["python3", "/home/user/Documents/clone/CodePython/CodeInProgressFich/CodeLoginJardel.py"])
 
     def go_prod(self):
         self.callback(PageProduction, self.shared_data)
@@ -135,6 +142,8 @@ class Application(tk.Tk):
         self.shared_data = SharedData()
         self.page_actuelle = None
         self.changer_page(Pageconnect, self.shared_data)
+
+    
 
     def changer_page(self, classe_page, shared_data):
         nouvelle_page = classe_page(self, self.changer_page, shared_data)

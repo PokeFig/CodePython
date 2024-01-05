@@ -3,12 +3,17 @@
 #######################################################################
 #                                                                     #
 # Version 2.0                                                         #
-# Autor : B.A                                                         #
+# Autor : L.P                                                         #
 #######################################################################
 #======================================================================
 
 import base64
 
+
+gUid = None
+gUrl = None
+password = "Ntm123456789!"
+database = "PokeFigDataBase"
 
 #======================================================================
 
@@ -17,7 +22,7 @@ def Product(models, gUid, password, database):
         product_ids = models.execute_kw( database, gUid, password,
                                         'product.template', 'search_read',
                                         [[]],
-                                        {'fields': ['id', 'name', 'list_price']})
+                                        {'fields': ['default_code']})
         return product_ids if product_ids else None
     except Exception as e:
         print(f"Erreur lors de la recherche des produits : {e}")
@@ -40,15 +45,30 @@ def SaveProductImage(models, db, uid, password, product_id, image_name):
             image_bytes = base64.b64decode(product[0]['image_1920'])
 
             # Sauvegarder l'image au format '.png' sur le disque
-            with open(image_name, 'wb') as f:
-                f.write(image_bytes)
+            with open(image_name + '.png', 'wb') as file:
+                file.write(image_bytes)
 
-            print(f"L'image du produit avec l'ID {product_id} a été sauvegardée dans {image_name}")
+            print(f"L'image du produit avec l'ID {product_id} a été sauvegardée dans {image_name}.png")
         else:
             print(f"Aucune image trouvée pour le produit avec l'ID {product_id}")
 
     except Exception as e:
         print(f"Erreur lors de la sauvegarde de l'image : {e}")
 
+#----------------------------------------------------------------------
+    
+def getManufOrderToDo(models,limit=10):
 
-#----------------------------------------------------------------------         
+    domain = [('state', '=', 'confirmed'), ('qty_produced', '!=', 'product_qty')]
+    fields = ['name', 'date_planned_start', 'product_id', 'product_qty', 'qty_producing', 'state']
+    limit = 10
+    if gUid:
+        mo_list = models.execute_kw(database, gUid, 'mrp.production', 'search_read',
+                                [domain], {'fields': fields, 'limit': limit})
+
+    for mo_dico in mo_list:
+        print(f'----------------------------')
+        for k in mo_dico.keys():
+            print(f' - {k} : {mo_dico[k]}')
+
+#----------------------------------------------------------------------
