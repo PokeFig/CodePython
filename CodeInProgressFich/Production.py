@@ -64,15 +64,15 @@ def getManufOrderToDo(models, limit=10):
         database, gUid,
         'mrp.production', 'search_read',
         [[('state', '=', 'confirmed'), ('qty_produced', '!=', 'product_qty')]],
-        {'fields': fields, 'limit': limit},
-        allow_none=True
+        {'fields': fields, 'limit': limit}
     )
 
-    if mo_list:
+    if mo_list is not None:
         for mo_dico in mo_list:
             print(f'----------------------------')
             for k in mo_dico.keys():
                 print(f' - {k} : {mo_dico[k]}')
     else:
         print("Aucun ordre de fabrication trouvé ou une erreur est survenue.")
---------------------------------------------------------------------
+
+#--------------------------------------------------------------------
