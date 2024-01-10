@@ -41,8 +41,8 @@ if __name__ == "__main__":
             for product in products:                                                                                                  # Boucle pour écriture la liste dans la console
                 print(f"ID: {product.get('id')}")
 
-    SaveProductImage(models_proxy, "PokeFigDataBase", 20, password, numéro_produit, numéro_produit)                                                # Enregistrement de l'image demandée
+    SaveProductImage(models_proxy, "PokeFigDataBase", 20, password, numéro_produit)                                                # Enregistrement de l'image demandée
         
-    getManufOrderToDo(models_proxy)
+   # getManufOrderToDo(models_proxy)
 
 #======================================================================

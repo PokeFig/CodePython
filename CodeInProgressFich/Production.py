@@ -30,7 +30,7 @@ def Product(models, gUid, password, database):
 
 #-------------------------------------------------------------------
 
-def SaveProductImage(models, db, uid, password, product_id, image_name):
+def SaveProductImage(models, db, uid, password, product_id):
     try:
         # Récupérer le produit avec l'identifiant product_id
         product = models.execute_kw(
@@ -39,7 +39,7 @@ def SaveProductImage(models, db, uid, password, product_id, image_name):
             [product_id],
             {'fields': ['image_1920']}
         )
-
+        image_name = str(product_id)
         if product and product[0].get('image_1920'):
             # Convertir la chaîne d'image base64 en bytes
             image_bytes = base64.b64decode(product[0]['image_1920'])
