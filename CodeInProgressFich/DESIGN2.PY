@@ -4,7 +4,7 @@ import xmlrpc.client
 
 
 #EnterPassword = Username #"Ntm123456789!"                                                                    #VARIABLE JARDEL POUR LE MOT DE PASSE
-#EnterEmail = Password #"logistique"                                                                  #VARIABLE JARDEL POUR MAIL OU IDENTIFIANT
+#EnterEmail = Password #"logistique"    "buisson.a@ad.afpi-bretagne.com"                                                              #VARIABLE JARDEL POUR MAIL OU IDENTIFIANT
 AuthentificationChek = False                                                                       #VARIABLE SI AUTHENTIFICATION CORRECTE
 ConnectionCheck = True                                                                             #VARIABLE SI CONNEXION est correcte
 ProfilType = None                                                                                  #VARIABLE TYPE DE PROFIL
@@ -35,6 +35,7 @@ class Pageconnect(tk.Frame):
         self.shared_data = shared_data
 
         # Création du groupe d'éléments
+        global content_frame
         content_frame = ttk.Frame(self)
 
         image_path = "CodePython/CodeInProgressFich/poke.png"
@@ -66,7 +67,8 @@ class Pageconnect(tk.Frame):
         Password = self.shared_data.pwd.get()
 
         self.ConnectionCheck()
-        self.getFields()
+        if AuthentificationChek == True :
+            self.getFields()
 
     
     def ConnectionCheck(self):                                                                             #Fonction block check Connection serveur Odoo
@@ -104,8 +106,8 @@ class Pageconnect(tk.Frame):
             if uid == 2 :
                 ProfilType = 'administrateur'
                 print(f"Profil administrateur")
-                ttk.Button(self, text="go prod", command=self.go_prod).grid(pady=10)
-                ttk.Button(self, text="go logic", command=self.go_logic).grid(pady=10)
+                ttk.Button(content_frame, text="go prod", command=self.go_prod).grid(row=2, column=0, columnspan=1, pady=10)
+                ttk.Button(content_frame, text="go logic", command=self.go_logic).grid(row=2, column=1, columnspan=1, pady=10)
                 
             else:
                 ProfilType = 'production'
@@ -144,7 +146,7 @@ class PageProduction(tk.Frame):
         tk.Button(self, text="Déconnexion", command=self.deco).pack(pady=10)
 
         # Afficher un bouton supplémentaire si l'utilisateur est "Mister-J23"
-        if Username == "BetaTest@gmail.com":
+        if ProfilType == "administrateur":
             tk.Button(self, text="Page Logistique", command=self.go_logic).pack(pady=10)
 
     def deco(self):
@@ -167,7 +169,7 @@ class PageLogistique(tk.Frame):
         tk.Button(self, text="Déconnexion", command=self.deco).pack(pady=10)
 
         # Afficher un bouton supplémentaire si l'utilisateur est "Mister-J23"
-        if Username == "BetaTest@gmail.com":
+        if ProfilType == "administrateur":
             tk.Button(self, text="Page Production", command=self.go_prod).pack(pady=10)
 
     def deco(self):
