@@ -26,23 +26,23 @@ gUid = None
 gUrl = None
 password = "Ntm123456789!"
 database = "PokeFigDataBase"
-numéro_produit = 48
+numéro_produit = 47                                                                                                                  # Sélection du nuémro de produit
 
 #======================================================================
 if __name__ == "__main__":
 
-    if models_proxy:
+    #if models_proxy:
 
-        products = Product(models_proxy, 20, password, database)                                                                      # Récupération de tous les produits de la BDD (ID, Nom, Prix)
+        #products = Product(models_proxy, 20, password, database)                                                                      # Récupération de tous les produits de la BDD (ID, Nom, Prix)
         
         
-        if products:
+        #if products:
 
-            for product in products:                                                                                                  # Boucle pour écriture la liste dans la console
-                print(f"ID: {product.get('id')}")
+            #for product in products:                                                                                                  # Boucle pour écriture la liste dans la console
+                #print(f"ID: {product.get('id')}")
 
-    SaveProductImage(models_proxy, "PokeFigDataBase", 20, password, numéro_produit)                                                # Enregistrement de l'image demandée
+    #SaveProductImage(models_proxy, "PokeFigDataBase", 20, password, numéro_produit)                                                   # Enregistrement de l'image demandée
         
-   # getManufOrderToDo(models_proxy)
+    getManufOrderToDo(models_proxy)
 
 #======================================================================
