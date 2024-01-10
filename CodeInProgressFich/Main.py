@@ -26,7 +26,7 @@ gUid = None
 gUrl = None
 password = "Ntm123456789!"
 database = "PokeFigDataBase"
-image_name = ''
+numéro_produit = 48
 
 #======================================================================
 if __name__ == "__main__":
@@ -41,9 +41,7 @@ if __name__ == "__main__":
             for product in products:                                                                                                  # Boucle pour écriture la liste dans la console
                 print(f"ID: {product.get('id')}")
 
-
-    image_name = (f"ID: {product.get('id')}")                                                                                         # Définit le nom de l'image
-    SaveProductImage(models_proxy, "PokeFigDataBase", 20, password, 48, image_name)                                                   # Enregistrement de l'image demandée
+    SaveProductImage(models_proxy, "PokeFigDataBase", 20, password, numéro_produit)                                                # Enregistrement de l'image demandée
         
     getManufOrderToDo(models_proxy)
 
