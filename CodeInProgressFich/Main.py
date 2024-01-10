@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
         products = Product(models_proxy, 20, password, database)                                                                        # Récupération de tous les produits de la BDD (ID, Nom, Prix)
 
-        SaveProductImage(models_proxy, "PokeFigDataBase", 20, password, 48, image_name)                                      # Enregistrement de l'image demandée
+        SaveProductImage(models_proxy, "PokeFigDataBase", 20, password, 48, 'test')                                      # Enregistrement de l'image demandée
         
         if products:
 

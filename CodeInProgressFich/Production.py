@@ -40,7 +40,7 @@ def SaveProductImage(models, db, uid, password, product_id, image_name):
             {'fields': ['image_1920']}
         )
 
-        image_name = {product_id}
+        #image_name = f"ID: {product.get('id')}"
 
         if product and product[0].get('image_1920'):
             # Convertir la chaîne d'image base64 en bytes
