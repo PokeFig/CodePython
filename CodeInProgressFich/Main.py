@@ -33,18 +33,18 @@ if __name__ == "__main__":
 
     if models_proxy:
 
-        products = Product(models_proxy, 20, password, database)                                                                        # Récupération de tous les produits de la BDD (ID, Nom, Prix)
+        products = Product(models_proxy, 20, password, database)                                                                      # Récupération de tous les produits de la BDD (ID, Nom, Prix)
         
         
         if products:
 
-            for product in products:                                                                                                       # Boucle pour écriture la liste dans la console
+            for product in products:                                                                                                  # Boucle pour écriture la liste dans la console
                 print(f"ID: {product.get('id')}")
 
 
-    image_name = (f"ID: {product.get('id')}")
-    SaveProductImage(models_proxy, "PokeFigDataBase", 20, password, 48, image_name)                                      # Enregistrement de l'image demandée
+    image_name = (f"ID: {product.get('id')}")                                                                                         # Définit le nom de l'image
+    SaveProductImage(models_proxy, "PokeFigDataBase", 20, password, 48, image_name)                                                   # Enregistrement de l'image demandée
         
-        #getManufOrderToDo(models_proxy)
+    getManufOrderToDo(models_proxy)
 
 #======================================================================
