@@ -14,7 +14,7 @@
 from odoo import Connect
 from Production import SaveProductImage
 from Production import Product
-#from Production import getManufOrderToDo
+from Production import getManufOrderToDo
 
 models_proxy = Connect(server_ip="172.31.10.65", server_port=8069, password="Ntm123456789!",)
 
@@ -26,21 +26,23 @@ gUid = None
 gUrl = None
 password = "Ntm123456789!"
 database = "PokeFigDataBase"
+numéro_produit = 47                                                                                                                  # Sélection du nuémro de produit
 
 #======================================================================
 if __name__ == "__main__":
 
-    if models_proxy:
+    #if models_proxy:
 
-        products = Product(models_proxy, 20, password, database)                                                                        # Récupération de tous les produits de la BDD (ID, Nom, Prix)
-
-        SaveProductImage(models_proxy, "PokeFigDataBase", 20, password, 48, "storage_box_image")                                      # Enregistrement de l'image demandée
+        #products = Product(models_proxy, 20, password, database)                                                                      # Récupération de tous les produits de la BDD (ID, Nom, Prix)
         
-        if products:
+        
+        #if products:
 
-            for product in products:                                                                                                       # Boucle pour écriture la liste dans la console
-                print(f"ID: {product.get('id')}")
+            #for product in products:                                                                                                  # Boucle pour écriture la liste dans la console
+                #print(f"ID: {product.get('id')}")
 
-        #Production.getManufOrderToDo(models_proxy)
+    #SaveProductImage(models_proxy, "PokeFigDataBase", 20, password, numéro_produit)                                                   # Enregistrement de l'image demandée
+        
+    getManufOrderToDo(models_proxy)
 
 #======================================================================

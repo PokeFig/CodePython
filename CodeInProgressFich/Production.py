@@ -28,10 +28,9 @@ def Product(models, gUid, password, database):
         print(f"Erreur lors de la recherche des produits : {e}")
         return None
 
-#---rom Production import SaveProductImage
 #-------------------------------------------------------------------
 
-def SaveProductImage(models, db, uid, password, product_id, image_name):
+def SaveProductImage(models, db, uid, password, product_id):
     try:
         # Récupérer le produit avec l'identifiant product_id
         product = models.execute_kw(
@@ -40,7 +39,7 @@ def SaveProductImage(models, db, uid, password, product_id, image_name):
             [product_id],
             {'fields': ['image_1920']}
         )
-
+        image_name = str(product_id)
         if product and product[0].get('image_1920'):
             # Convertir la chaîne d'image base64 en bytes
             image_bytes = base64.b64decode(product[0]['image_1920'])
@@ -58,7 +57,7 @@ def SaveProductImage(models, db, uid, password, product_id, image_name):
 
 #----------------------------------------------------------------------
     
-def getManufOrderToDo(models, limit=10):
+def getManufOrderToDo(models):
     fields = ['name', 'date_planned_start', 'product_id', 'product_qty', 'qty_producing', 'state']
     limit = 10
     mo_list = models.execute_kw(
@@ -68,7 +67,7 @@ def getManufOrderToDo(models, limit=10):
         {'fields': fields, 'limit': limit}
     )
 
-    if mo_list is not None:
+    if mo_list:
         for mo_dico in mo_list:
             print(f'----------------------------')
             for k in mo_dico.keys():
