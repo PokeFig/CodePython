@@ -1,6 +1,9 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import xmlrpc.client
+from odoo import Connect
+from Production import SaveProductImage
+from Production import Product
 
 
 #EnterPassword = Username #"Ntm123456789!"                                                                    #VARIABLE JARDEL POUR LE MOT DE PASSE
@@ -10,7 +13,7 @@ ConnectionCheck = True                                                          
 ProfilType = None                                                                                  #VARIABLE TYPE DE PROFIL
 
 #Gestion des identifiants serveurs
-server_ip = "172.31.10.65"                                                                         #IP de connection du serveur Odoo
+server_ip = "172.31.10.64"                                                                         #IP de connection du serveur Odoo
 server_port = 8069                                                                                 #Port de dconnection du serveur Odoo
 data_base = "PokeFigDataBase"                                                                      #Nom du conteneur dans Odoo
 #password = EnterPassword                                                                           #Gestion du mot de passe
@@ -38,8 +41,8 @@ class Pageconnect(tk.Frame):
         global content_frame
         content_frame = ttk.Frame(self)
 
-        image_path = "CodePython/CodeInProgressFich/poke.png"
-        self.image = tk.PhotoImage(file=image_path)
+        #image_path = "CodePython/CodeInProgressFich/poke.png"
+        self.image = tk.PhotoImage(file="CodePython/CodeInProgressFich/poke.png")
 
         # Créer un Label pour afficher l'image
         image_label = tk.Label(self, image=self.image, background="#33c4ff")
@@ -117,7 +120,7 @@ class Pageconnect(tk.Frame):
         except:
             print(f"Profil logistique")  
             ProfilType = 'logistique'
-            self.callback(PageProduction, self.shared_data)
+            self.callback(PageLogistique, self.shared_data)
 
 
 
@@ -131,6 +134,8 @@ class Pageconnect(tk.Frame):
     def go_Admin(self):
         self.callback(PageDetails, self.shared_data)
 
+       
+
 
 class PageProduction(tk.Frame):
     def __init__(self, master, callback, shared_data):
@@ -139,15 +144,40 @@ class PageProduction(tk.Frame):
         self.master = master
         self.callback = callback
         self.shared_data = shared_data
+        models_proxy = Connect(server_ip="172.31.10.64", server_port=8069, password="Ntm123456789!",)
+        #self.image = tk.PhotoImage(file="CodePython/CodeInProgressFich/poke.png")
+
+        # Création de l'objet PhotoImage à partir du fichier image
+        self.prod1 = tk.PhotoImage(file="CodePython/CodeInProgressFich/poke.png")
+
+        tk.Label(self,image = self.prod1).pack(pady=10)
+
 
         tk.Label(self, text="C'est la page de Production").pack(pady=10)
 
+        
+        if models_proxy:
+
+            products = Product(models_proxy, 56 , Password, data_base)                                                                      # Récupération de tous les produits de la BDD (ID, Nom, Prix)
+        
+
+        
+        if products:
+
+            for product in products:                                                                                                  # Boucle pour écriture la liste dans la console
+                print(f"ID: {product.get('id')}")
+                SaveProductImage(models_proxy, "PokeFigDataBase", 56, Password, product.get('id'))                                                   # Enregistrement de l'image demandée
+
+                
+
+        
         # Bouton pour revenir à la page d'accueil
         tk.Button(self, text="Déconnexion", command=self.deco).pack(pady=10)
 
         # Afficher un bouton supplémentaire si l'utilisateur est "Mister-J23"
         if ProfilType == "administrateur":
             tk.Button(self, text="Page Logistique", command=self.go_logic).pack(pady=10)
+
 
     def deco(self):
         self.callback(Pageconnect, self.shared_data)
