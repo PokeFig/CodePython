@@ -10,7 +10,7 @@
 import xmlrpc.client
 #======================================================================
 
-def Connect(server_ip="172.31.10.65", server_port=8069, password="Ntm123456789!"):                                   #Définition de l'accès a la odoo
+def Connect(server_ip="172.31.10.64", server_port=8069, password="Ntm123456789!"):                                   #Définition de l'accès a la odoo
 
     gUrl = f"http://{server_ip}:{server_port}/xmlrpc/2/common"                                                       #Construction de l'URL de connexion Odoo
 

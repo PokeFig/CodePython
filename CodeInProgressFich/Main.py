@@ -16,7 +16,7 @@ from Production import SaveProductImage
 from Production import Product
 from Production import getManufOrderToDo
 
-models_proxy = Connect(server_ip="172.31.10.65", server_port=8069, password="Ntm123456789!",)
+models_proxy = Connect(server_ip="172.31.10.64", server_port=8069, password="Ntm123456789!",)
 
 #======================================================================
 #Déclaration de varaibles global
