@@ -22,8 +22,6 @@ models_proxy = Connect(server_ip="172.31.10.64", server_port=8069, password="Ntm
 #Déclaration de varaibles global
 #----------------------------------------------------------------------
 
-gUid = None
-gUrl = None
 password = "Ntm123456789!"
 database = "PokeFigDataBase"
 numéro_produit = 47                                                                                                                  # Sélection du nuémro de produit
