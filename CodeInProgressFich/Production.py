@@ -11,6 +11,7 @@ import base64
 import xmlrpc.client
 
 #======================================================================
+
 server_ip="172.31.10.64"
 server_port=8069
 password = "Ntm123456789!"
