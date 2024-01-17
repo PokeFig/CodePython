@@ -24,7 +24,7 @@ ConnectionCheck = True                                                          
 ProfilType = None                                                                                  #VARIABLE TYPE DE PROFIL
 
 #Gestion des identifiants serveurs
-server_ip = "172.31.10.65"                                                                         #IP de connection du serveur Odoo
+server_ip = "172.31.10.64"                                                                         #IP de connection du serveur Odoo
 server_port = 8069                                                                                 #Port de dconnection du serveur Odoo
 data_base = "PokeFigDataBase"                                                                      #Nom du conteneur dans Odoo
 password = EnterPassword                                                                           #Gestion du mot de passe
