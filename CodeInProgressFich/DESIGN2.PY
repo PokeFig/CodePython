@@ -169,7 +169,8 @@ class PageProduction(tk.Frame):
                 # Enregistrement de l'image demandée
                 ShowProductImage(self, models_proxy, "PokeFigDataBase", 56, Password, product.get('id'))
                 tk.Label(self, text="boucle").pack(pady=10)
-                
+
+                self.update_idletasks()  # Ajout de la mise à jour de la fenêtre
 
                 
                 

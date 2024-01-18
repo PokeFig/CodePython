@@ -8,7 +8,8 @@
 #======================================================================
 
 import tkinter as tk
-from PIL import Image
+import PIL
+from PIL import Image, ImageTk
 import base64
 import io
 import xmlrpc.client
@@ -49,11 +50,15 @@ def ShowProductImage(self, models, db, uid, password, product_id):
             # Créer l'objet PhotoImage à partir des bytes
             #tk_image = tk.PhotoImage(data=image_bytes)
              # Créer l'objet Image à partir des bytes
-            mage = Image.open(io.BytesIO(image_bytes))
+            image = Image.open(io.BytesIO(image_bytes))
+            tk_image = ImageTk.PhotoImage(image)
+
+
 
             # Afficher l'image dans une fenêtre Tkinter
-            label = tk.Label(self, image= mage)
+            label = tk.Label(self, image=tk_image)
             label.pack(padx=10, pady=10)
+            self.update_idletasks()
         else:
             print(f"Le produit avec l'ID {product_id} n'a pas d'image.")
     except Exception as e:
