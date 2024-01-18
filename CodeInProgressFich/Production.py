@@ -128,7 +128,7 @@ def progessManufOrder(models, order_id,quantity):
 
     values = {
         'qty_produced': quantity,
-        'state': 'progress'
+        #'state': 'progress'
     }
 
     try:
