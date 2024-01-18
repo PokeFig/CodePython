@@ -6,6 +6,7 @@ class SharedData:
     def __init__(self):
         self.user = tk.StringVar()
         self.pwd = tk.StringVar()
+        self.listing_acces = None  # Définir listing_acces en tant que variable globale
 
 #page de connexion
 class Pageconnect(tk.Frame):
@@ -16,13 +17,11 @@ class Pageconnect(tk.Frame):
         self.callback = callback
         self.shared_data = shared_data
 
-        self.prof = None
-
 
         #création du groupe d'éléments
         content_frame = ttk.Frame(self)
         
-        image_path = "CodePython/CodeInProgressFich/poke.png"
+        image_path = "/home/user/Documents/clone/poke.png"
         self.image = tk.PhotoImage(file=image_path)
 
         # Créer un Label pour afficher l'image
@@ -45,14 +44,14 @@ class Pageconnect(tk.Frame):
 
 
 
-    def afficher_boutons_pages(self, newvar):
+    def afficher_boutons_pages(self):
 
         Username = self.shared_data.user.get()
         Password = self.shared_data.pwd.get()
 
 
-        EnterPassword = self.shared_data.user.get()#"Ntm123456789!"                                                                    #VARIABLE JARDEL POUR LE MOT DE PASSE
-        EnterEmail =  self.shared_data.pwd.get()#"BetaTest@gmail.com"                                                                  #VARIABLE JARDEL POUR MAIL OU IDENTIFIANT
+        #EnterPassword = self.shared_data.user.get()#"Ntm123456789!"                                                                    #VARIABLE JARDEL POUR LE MOT DE PASSE
+        #EnterEmail =  self.shared_data.pwd.get()#"BetaTest@gmail.com"                                                                  #VARIABLE JARDEL POUR MAIL OU IDENTIFIANT
         AuthentificationChek = False                                                                       #VARIABLE SI AUTHENTIFICATION CORRECTE
         ConnectionCheck = True                                                                             #VARIABLE SI CONNEXION est correcte
         ProfilType = None                                                                                  #VARIABLE TYPE DE PROFIL 
@@ -61,10 +60,16 @@ class Pageconnect(tk.Frame):
         server_ip = "172.31.10.65"                                                                         #IP de connection du serveur Odoo
         server_port = 8069                                                                                 #Port de dconnection du serveur Odoo
         data_base = "PokeFigDataBase"                                                                      #Nom du conteneur dans Odoo
-        password = EnterPassword                                                                           #Gestion du mot de passe
-        Email = EnterEmail                                                                                 #Gestion de l'identifiant
+                                                                                 #Gestion de l'identifiant
         url = f'http://{server_ip}:{server_port}'
         uid = None
+        
+
+        # Appeler la fonction ConnectionCheck
+        self.ConnectionCheck()
+
+        # Appeler la fonction getFields
+        self.getFields()
 
 
         def ConnectionCheck():                                                                             #Fonction block check Connection serveur Odoo
@@ -74,7 +79,7 @@ class Pageconnect(tk.Frame):
             urlOdoo = f"http://{server_ip}:{server_port}/xmlrpc/2/common"                                 #Génération du lien pour la connection de Odoo
             try:
                 common_proxy = xmlrpc.client.ServerProxy(urlOdoo)                                          #Connection au serveur avec le lien
-                uid = common_proxy.authenticate(data_base, Email, password, {})                            #Connection au profile
+                uid = common_proxy.authenticate(data_base, Username, Password, {})                            #Connection au profile
                 
                 if uid is not False:
                     print(f"Connecté à Odoo version {common_proxy.version()}")                             #Retour d'information de la version d'odoo 
@@ -90,9 +95,6 @@ class Pageconnect(tk.Frame):
                 print(f"Erreur de connexion à Odoo : {e}")                                                 #Retour du code erreur si pas de connexion avec le serveur
                 print("Échec Connexion")
                 ConnectionCheck = False
-                messagebox.showinfo(
-                message=f'!!!Aucun droit!!!'
-            )
                 return None
 
         def getFields():                                                                                   #Fonction block pour avoir les autorisations
@@ -100,53 +102,21 @@ class Pageconnect(tk.Frame):
             global listing_acces
             models = xmlrpc.client.ServerProxy('{}/xmlrpc/2/object'.format(url))                           #Connection au serveur
             try:                                                                                            
-                acces = models.execute_kw(data_base, uid, password, 'mrp.production', 'check_access_rights', ['write'])                                               
+                acces = models.execute_kw(data_base, uid, Password, 'mrp.production', 'check_access_rights', ['write'])                                               
                 print(f"Manufactoring order write acces rights :{acces}")
                 if uid == 2 :
                     ProfilType = 'administrateur'
-                    ttk.Button(self, text="Production", command=self.go_prod).pack()
-                    ttk.Button(self, text="Logistique", command=self.go_logic).pack()
-                    ttk.Button(self, text="Administrateur", command=self.go_Admin).pack()
                     print(f"Profil administrateur")
                 else:
                     ProfilType = 'production'
-                    self.callback(PageProduction, self.shared_data)
                     print(f"Profil production")
 
             except:
                 print(f"Profil logistique")  
                 ProfilType = 'logistique'
-                self.callback(PageLogistique, self.shared_data)
-
-            #listing_acces = models.execute_kw(data_base, uid, password, 'mrp.production', 'fields_get', [], {'attributes': []})
-            #for attr in listing_acces:
-                #print(f'-{attr}')
-            #else:
-                #print(f'Odoo server authentification rejected : DB = {data_base} User ={uid}')
-
-        def AiguillageFields():
-
-            if listing_acces is not None:
-                for attr in listing_acces:
-                    if 'product_id' in str(attr):
-                        print(f"Nom trouvé Production")
-                        ProfilType = 'Production'
-                        return True
-                    
-            print(f"Nom  non trouvé")
-            ProfilType = 'logistique'
-            return False
-
-
-
-        self.prof = newvar
-
-        #subprocess.run(["python3", "/home/user/Documents/clone/CodePython/CodeInProgressFich/CodeLoginJardel.py"])
-
+      
         
-            
-        
-        
+       
 
     def go_prod(self):
         self.callback(PageProduction, self.shared_data)
