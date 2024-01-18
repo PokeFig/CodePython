@@ -142,13 +142,17 @@ def progessManufOrder(models, order_id,quantity):
 
 #--------------------------------------------------------------------
         
-def DoneManufOrder(models, order_id):
+def DoneManufOrder(models, order_id,quantity):
     model = 'mrp.production'
-    
+
+    values = {
+        'qty_produced': quantity,
+        'state': 'done'
+    }
+
     try:
-        # Appel à la méthode button_mark_done pour terminer l'ordre de fabrication
         models.execute_kw(database, gUid, password,
-                          model, 'button_mark_done', [[order_id]])
+                          model, 'write', [[order_id], values])
 
         print(f"Ordre de fabrication #{order_id} terminé avec succès.")
 

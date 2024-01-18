@@ -46,7 +46,7 @@ if __name__ == "__main__":
      #Production.createManufOrder(models_proxy, quantity, product_id)                                                 #Création des OF
      #Production.confirmManufOrder(models_proxy,order_id)                                                             #confirmation de l'OF
      #Production.progessManufOrder(models_proxy,order_id, quantity)
-     #Production.DoneManufOrder(models_proxy, order_id)                                                               #Ordre de fabrication terminé
+     Production.DoneManufOrder(models_proxy, order_id)                                                               #Ordre de fabrication terminé
      #Production.CancelManufOrder(models_proxy,order_id)
 
 #======================================================================
