@@ -110,7 +110,7 @@ def createManufOrder(models, product_id, quantity):
         order_id = models.execute_kw(database, gUid, password,
                                      model, 'create', [values])
 
-        print(f"Ordre de fabrication créé avec succès. ID: {order_id}")
+        print(f"Ordre de fabrication créé avec succès. ID: {order_id}  et {quantity} produits à fabriqué")
 
     except Exception as e:
         print(f"Erreur lors de la création de l'ordre de fabrication: {e}")
