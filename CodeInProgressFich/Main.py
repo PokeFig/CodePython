@@ -42,6 +42,6 @@ if __name__ == "__main__":
 
         
      #getManufOrderToDo(models_proxy)
-     createManufOrder(models_proxy, product_id=47, quantity=10, 'confirmed')
+     createManufOrder(models_proxy, product_id=47, quantity=1)
 
 #======================================================================

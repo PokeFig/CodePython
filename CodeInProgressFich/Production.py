@@ -94,9 +94,10 @@ def getManufOrderToDo(models):
 
 #--------------------------------------------------------------------
         
-def createManufOrder(models, product_id, quantity, production_info):
+def createManufOrder(models, product_id, quantity):
     
     model = 'mrp.production'
+    production_info = 'confirmed'
     
    
     values = {
