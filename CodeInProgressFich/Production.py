@@ -112,7 +112,7 @@ def createManufOrder(models, product_id, quantity):
                                      model, 'create', [values])
 
         print(f"Ordre de fabrication créé avec succès. ID: {order_id}  et {quantity} produits à fabriqué à l'état :{'state'}")
-'
+
     except Exception as e:
         print(f"Erreur lors de la création de l'ordre de fabrication: {e}")
   

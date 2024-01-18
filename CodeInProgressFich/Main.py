@@ -12,9 +12,9 @@
 #======================================================================
 
 from odoo import Connect
-from Production import SaveProductImage
-from Production import Product
-from Production import getManufOrderToDo
+#from Production import SaveProductImage
+#from Production import Product
+#from Production import getManufOrderToDo
 from Production import createManufOrder
 
 models_proxy = Connect(server_ip="172.31.10.64", server_port=8069, password="Ntm123456789!",)
