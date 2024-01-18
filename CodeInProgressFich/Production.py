@@ -103,7 +103,6 @@ def createManufOrder(models, product_id, quantity):
     values = {
         'product_id': product_id,
         'product_qty': quantity,
-        'state' : 'confirmed',
     }
 
     try:
@@ -111,8 +110,31 @@ def createManufOrder(models, product_id, quantity):
         order_id = models.execute_kw(database, gUid, password,
                                      model, 'create', [values])
 
-        print(f"Ordre de fabrication créé avec succès. ID: {order_id}  et {quantity} produits à fabriqué à l'état :{'state'}")
+        print(f"Ordre de fabrication créé avec succès. ID: {order_id}  et {quantity} produits à fabriqué")
 
     except Exception as e:
         print(f"Erreur lors de la création de l'ordre de fabrication: {e}")
+
+#--------------------------------------------------------------------
+        
+def confirmManufOrder(models, order_id):
+    model = 'mrp.production'
+
+    values = {
+        'state': 'confirmed',
+    }
+
+    try:
+        # Mettez à jour l'ordre de fabrication pour le passer à l'état "confirmé"
+        models.execute_kw(database, gUid, password,
+                          model, 'write', [[order_id], values])
+
+        print(f"Ordre de fabrication #{order_id} confirmé avec succès.")
+
+    except Exception as e:
+        print(f"Erreur lors de la confirmation de l'ordre de fabrication: {e}")
+
+# Exemple d'utilisation de la fonction pour confirmer un ordre de fabrication
+# Remplacez 'order_id' par l'ID de l'ordre de fabrication que vous souhaitez confirmer
+confirmManufOrder(models, order_id=1)
   
