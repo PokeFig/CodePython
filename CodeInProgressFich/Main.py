@@ -34,21 +34,21 @@ if __name__ == "__main__":
 
     if models_proxy:
 
-        products = Production.Product(models_proxy, 20, password, database)                                                                      # Récupération de tous les produits de la BDD (ID, Nom, Prix)
+        #products = Production.Product(models_proxy, 20, password, database)                                                                      # Récupération de tous les produits de la BDD (ID, Nom, Prix)
         
         
-        if products:
+        #if products:
 
-            for product in products:                                                                                                  # Boucle pour écriture la liste dans la console
-                print(f"ID: {product.get('id')}")
+            #for product in products:                                                                                                  # Boucle pour écriture la liste dans la console
+                #print(f"ID: {product.get('id')}")
                 #SaveProductImage(models_proxy, "PokeFigDataBase", 20, password, product.get('id'))                                                   # Enregistrement de l'image demandée
 
         
-    Production.getManufOrderToDo(models_proxy)                                                                      #Récupération des OF
-    Production.createManufOrder(models_proxy, product_id=57, quantity)                                           #Création des OF
+     Production.getManufOrderToDo(models_proxy)                                                                      #Récupération des OF
+     Production.createManufOrder(models_proxy, quantity, product_id=57)                                           #Création des OF
 
-    #Production.confirmManufOrder(models_proxy,order_id)                                                             #confirmation de l'OF
-    Production.DoneManufOrder(models_proxy, order_id, quantity)                                                                 #Ordre de fabrication terminé
-    #Production.CancelManufOrder(models_proxy,order_id)
+     #Production.confirmManufOrder(models_proxy,order_id)                                                             #confirmation de l'OF
+     #Production.DoneManufOrder(models_proxy, order_id, quantity)                                                                 #Ordre de fabrication terminé
+     #Production.CancelManufOrder(models_proxy,order_id)
 
 #======================================================================
