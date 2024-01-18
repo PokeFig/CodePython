@@ -139,3 +139,36 @@ if __name__ == "__main__":
         for ListingProduction in ListingProduction:                                                 # Boucle pour écriture la liste dans la console
                 product_name_to_search = ListingProduction.get('name')
                 search_product_in_stock_by_name(product_name_to_search)
+
+
+
+#============================================================================================================================
+#Ecriture dans le stockage de la base de données
+#============================================================================================================================
+
+def WriteStockage(product_id, new_quantity):                                                        #Fonction pour écriture de la base de données
+
+    try:
+        # Recherche du stock du produit
+        stock_Modification_id = models.execute_kw(data_base, uid, password,
+                                     'stock.quant', 'search',
+                                     [[('product_id', '=', product_id)]])
+        
+        # Modification du stock
+        if stock_Modification_id:
+            # Extraire l'ID du premier élément de la liste
+            stock_id_to_modify = stock_Modification_id[0]
+            models.execute_kw(data_base, uid, password,
+                              'stock.quant', 'write',
+                              [[stock_id_to_modify], {'quantity': new_quantity}])
+            print(f"Stock du produit avec l'ID {product_id} modifié avec succès.")
+        else:
+            print(f"Aucun stock trouvé pour le produit avec l'ID {product_id}.")
+
+    except Exception as e:
+        print(f"Erreur lors de la modification du stock : {e}")
+
+
+product_id_to_modify = 57                                                                           #Stockage_ID a modifier dans la base de donnée
+new_quantity_value = 50                                                                             #Quantité du produit
+WriteStockage(product_id_to_modify, new_quantity_value)                                             #
