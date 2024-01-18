@@ -142,11 +142,11 @@ def DoneManufOrder(models, order_id):
 
 #--------------------------------------------------------------------
         
-def addManufOrder(models, order_id,quantity):
+def addManufOrder(models,quantity,order_id):
     model = 'stock.move'
 
     values = {
-        'quantity_done': quantity
+        'quantity_done': quantity,
           }
 
     try:
