@@ -117,7 +117,7 @@ def createManufOrder(models, product_id, quantity):
 
 #--------------------------------------------------------------------
         
-def confirmManufOrder(models, order_id):
+#def confirmManufOrder(models, order_id):
     model = 'mrp.production'
 
     values = {
@@ -136,5 +136,4 @@ def confirmManufOrder(models, order_id):
 
 # Exemple d'utilisation de la fonction pour confirmer un ordre de fabrication
 # Remplacez 'order_id' par l'ID de l'ordre de fabrication que vous souhaitez confirmer
-confirmManufOrder(models, order_id=1)
   
