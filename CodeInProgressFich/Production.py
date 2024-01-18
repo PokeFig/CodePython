@@ -109,10 +109,11 @@ def createManufOrder(models, quantity, product_id ):
 
 #--------------------------------------------------------------------
         
-def confirmManufOrder(models, order_id):
+def confirmManufOrder(models, order_id,qty_produced):
     model = 'mrp.production'
 
     values = {
+        'qty_produced': qty_produced,
         'state': 'confirmed',
     }
 
@@ -127,11 +128,10 @@ def confirmManufOrder(models, order_id):
 
 #--------------------------------------------------------------------
         
-def DoneManufOrder(models, order_id,qty_produced):
+def DoneManufOrder(models, order_id):
     model = 'mrp.production'
 
     values = {
-        'qty_produced': qty_produced,
         'state': 'done',
     }
 
