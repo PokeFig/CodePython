@@ -15,11 +15,11 @@
 #==========================================================
 
 import xmlrpc.client
-#import design
+import design
 
 
 EnterPassword = "Ntm123456789!"                                                                    #VARIABLE JARDEL POUR LE MOT DE PASSE
-EnterEmail = "production"                                                                  #VARIABLE JARDEL POUR MAIL OU IDENTIFIANT
+EnterEmail = "buisson.a@ad.afpi-bretagne.com"                                                                  #VARIABLE JARDEL POUR MAIL OU IDENTIFIANT
 AuthentificationChek = False                                                                       #VARIABLE SI AUTHENTIFICATION CORRECTE
 ConnectionCheck = True                                                                             #VARIABLE SI CONNEXION est correcte
 ProfilType = None                                                                                  #VARIABLE TYPE DE PROFIL

@@ -28,7 +28,8 @@ def Product(models, gUid, password, database):
         print(f"Erreur lors de la recherche des produits : {e}")
         return None
 
-#----------------------------------------------------------------------
+#---rom Production import SaveProductImage
+#-------------------------------------------------------------------
 
 def SaveProductImage(models, db, uid, password, product_id, image_name):
     try:
@@ -57,18 +58,22 @@ def SaveProductImage(models, db, uid, password, product_id, image_name):
 
 #----------------------------------------------------------------------
     
-def getManufOrderToDo(models,limit=10):
-
-    domain = [('state', '=', 'confirmed'), ('qty_produced', '!=', 'product_qty')]
+def getManufOrderToDo(models, limit=10):
     fields = ['name', 'date_planned_start', 'product_id', 'product_qty', 'qty_producing', 'state']
     limit = 10
-    if gUid:
-        mo_list = models.execute_kw(database, gUid, 'mrp.production', 'search_read',
-                                [domain], {'fields': fields, 'limit': limit})
+    mo_list = models.execute_kw(
+        database, gUid,
+        'mrp.production', 'search_read',
+        [[('state', '=', 'confirmed'), ('qty_produced', '!=', 'product_qty')]],
+        {'fields': fields, 'limit': limit}
+    )
 
-    for mo_dico in mo_list:
-        print(f'----------------------------')
-        for k in mo_dico.keys():
-            print(f' - {k} : {mo_dico[k]}')
+    if mo_list is not None:
+        for mo_dico in mo_list:
+            print(f'----------------------------')
+            for k in mo_dico.keys():
+                print(f' - {k} : {mo_dico[k]}')
+    else:
+        print("Aucun ordre de fabrication trouvé ou une erreur est survenue.")
 
-#----------------------------------------------------------------------
+#--------------------------------------------------------------------
