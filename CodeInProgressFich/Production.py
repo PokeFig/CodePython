@@ -158,14 +158,13 @@ def CancelManufOrder(models, order_id):
     except Exception as e:
         print(f"Erreur lors de l'annualtion de l'ordre de fabrication: {e}")
 
-  #--------------------------------------------------------------------
+#--------------------------------------------------------------------
         
-def addUnitsToStock(models, product_id, quantity, location_id):
+def addUnitsToStock(models, product_id, quantity):
     model = 'stock.move'
 
     values = {
         'product_id': product_id,
-        'location_id': location_id,
         'quantity_done': quantity,
         # Ajoutez d'autres champs requis selon votre besoin
     }
