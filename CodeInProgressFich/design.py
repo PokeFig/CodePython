@@ -21,7 +21,7 @@ class Pageconnect(tk.Frame):
         #création du groupe d'éléments
         content_frame = ttk.Frame(self)
         
-        image_path = "CodePython/CodeInProgressFich/poke.png"
+        image_path = "/home/user/Documents/clone/poke.png"
         self.image = tk.PhotoImage(file=image_path)
 
         # Créer un Label pour afficher l'image
