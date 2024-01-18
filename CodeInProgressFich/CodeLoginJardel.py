@@ -15,11 +15,9 @@
 #==========================================================
 
 import xmlrpc.client
-import design
-from design import SharedData, Pageconnect
 
-EnterPassword = Pageconnect.shared_data.pwd.get()#"Ntm123456789!"                                                                    #VARIABLE JARDEL POUR LE MOT DE PASSE
-EnterEmail = Pageconnect.shared_data.user.get()#"BetaTest@gmail.com"                                                                  #VARIABLE JARDEL POUR MAIL OU IDENTIFIANT
+EnterPassword = "Ntm123456789!"                                                                    #VARIABLE JARDEL POUR LE MOT DE PASSE
+EnterEmail =  "BetaTest@gmail.com"                                                                  #VARIABLE JARDEL POUR MAIL OU IDENTIFIANT
 AuthentificationChek = False                                                                       #VARIABLE SI AUTHENTIFICATION CORRECTE
 ConnectionCheck = True                                                                             #VARIABLE SI CONNEXION est correcte
 ProfilType = None                                                                                  #VARIABLE TYPE DE PROFIL 
@@ -68,14 +66,17 @@ def getFields():                                                                
         print(f"Manufactoring order write acces rights :{acces}")
         if uid == 2 :
             ProfilType = 'administrateur'
+            Pageconnect().afficher_boutons_pages(ProfilType)
             print(f"Profil administrateur")
         else:
             ProfilType = 'production'
+            Pageconnect().afficher_boutons_pages(ProfilType)
             print(f"Profil production")
 
     except:
         print(f"Profil logistique")  
         ProfilType = 'logistique'
+        Pageconnect().afficher_boutons_pages(ProfilType)
 
     #listing_acces = models.execute_kw(data_base, uid, password, 'mrp.production', 'fields_get', [], {'attributes': []})
     #for attr in listing_acces:
