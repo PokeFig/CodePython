@@ -10,13 +10,13 @@ import CodeLogin
 import base64
 
 EnterPassword = "Ntm123456789!"                                                                    #VARIABLE JARDEL POUR LE MOT DE PASSE
-EnterEmail = "BetaTest@gmail.com"                                                                  #VARIABLE JARDEL POUR MAIL OU IDENTIFIANT
+EnterEmail = "buisson.a@ad.afpi-bretagne.com"                                                      #VARIABLE JARDEL POUR MAIL OU IDENTIFIANT
 AuthentificationChek = False                                                                       #VARIABLE SI AUTHENTIFICATION CORRECTE
 ConnectionCheck = True                                                                             #VARIABLE SI CONNEXION est correcte
 ProfilType = None                                                                                  #VARIABLE TYPE DE PROFIL
 
 #Gestion des identifiants serveurs
-server_ip = "172.31.10.65"                                                                         #IP de connection du serveur Odoo
+server_ip = "172.31.10.64"                                                                         #IP de connection du serveur Odoo
 server_port = 8069                                                                                 #Port de dconnection du serveur Odoo
 data_base = "PokeFigDataBase"                                                                      #Nom du conteneur dans Odoo
 password = EnterPassword                                                                           #Gestion du mot de passe
@@ -74,57 +74,68 @@ def getFields():                                                                
     #else:
         #print(f'Odoo server authentification rejected : DB = {data_base} User ={uid}')
 
+#===========================================================================================================================
+#===========================================================================================================================
 
-
-#########################################################################################################################
-#==========================================================
-# Fonction Block Connexion
-#==========================================================
-
-import CodeLogin
-import base64
-
-def Stock():
-
-    try:
-        Stock_ids = models.execute_kw(data_base, uid, password,
-                                        'stock.quant', 'search_read',
-                                        [[]],
-                                        {'fields': ['location_id','quantity']})
-        return Stock_ids if Stock_ids else None
-
-
-    except Exception as e:
-        print(f"Erreur lors de la recherche des produits : {e}")
-        return None
-
-def product():
+def product():                                                                                     #Block de recherche production
    
     try:
         product_ids = models.execute_kw( data_base, uid, password,
                                         'product.template', 'search_read',
                                         [[]],
-                                        {'fields': ['id', 'name', 'list_price','default_code']})
+                                        {'fields': ['id', 'name', 'list_price',]})
         return product_ids if product_ids else None
    
     except Exception as e:
         print(f"Erreur lors de la recherche des produits : {e}")
         return None
-     
-#==========================================================
-# Main
-#==========================================================
-if __name__ == "__main__":
-    ConnectionCheck()
-    getFields()  
-    ListingStock = Stock()
-    ListingProduction = product()
 
-    if ListingStock and ListingProduction:
+def search_product_in_stock_by_name(product_name):                                                 #Block de recherche dans stockage + listing all
+    try:
+        # Recherche des articles dans le stock dans la base de données
+        stock_ids = models.execute_kw(data_base, uid, password,
+                                      'stock.quant', 'search',
+                                      [[('product_id.name', 'ilike', product_name)]])
+        
+        if stock_ids:
+            for stock_id in stock_ids:
+                # Récupération des informations sur l'article dans le stock
+                stock_info = models.execute_kw(data_base, uid, password,
+                                               'stock.quant', 'read',
+                                               [stock_id],
+                                               {'fields': ['id', 'product_id', 'quantity']})
+                if stock_info[0]['quantity'] >= 0 :
+                    stock_info_dict = {
+                                        'id': stock_info[0]['id'],
+                                        'Stockage_id': stock_info[0]['product_id'][0],
+                                        'name': stock_info[0]['product_id'][1],
+                                        'quantity': stock_info[0]['quantity'], 
+                                        'Product_id': ListingProduction.get('id'),
+                                        'Prix': ListingProduction.get('list_price')
+                                        }
+                    stock_info_list.append(stock_info_dict)
+                    print(stock_info_dict)
+                    #print(f"ID: {stock_info[0]['id']}, Article ID: {stock_info[0]['product_id'][0]}, Nom: {stock_info[0]['product_id'][1]}, Quantité: {stock_info[0]['quantity']}")
+        else:
+            print(f"Pas de produit en stock : '{product_name}'.")
 
-            for ListingStock in ListingStock:                                                                    # Boucle pour écriture la liste dans la console
-                print(f"ID: {ListingStock.get('location_id')}, Quantity: {ListingStock.get('quantity')}")
-            
-            for ListingProduction in ListingProduction:                                                          # Boucle pour écriture la liste dans la console
-                print(f"ID: {ListingProduction.get('id')}, Nom: {ListingProduction.get('name')}, Prix: {ListingProduction.get('default_code')}",)
-            
+    except Exception as e:
+        print(f"Erreur lors de la recherche d'articles dans le stock : {e}")
+#===========================================================================================================================
+#MAIN
+#===========================================================================================================================
+        
+
+if __name__ == "__main__":                                                               
+    ConnectionCheck()                                                                               #ConnectionCheck
+    getFields()                                                                                     #GestionDeProfil
+    
+#===========================================================================================================================
+        
+    ListingProduction = product()                                                                   #Listing Product
+    stock_info_list = []                                                                            #Création du listing pour jardel
+
+    if ListingProduction:                                                                           #Si la liste de production n'est pas vide
+        for ListingProduction in ListingProduction:                                                 # Boucle pour écriture la liste dans la console
+                product_name_to_search = ListingProduction.get('name')
+                search_product_in_stock_by_name(product_name_to_search)
