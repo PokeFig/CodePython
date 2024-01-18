@@ -2,8 +2,8 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import xmlrpc.client
 from odoo import Connect
-from Production import SaveProductImage
-from Production import Product
+from Production1copy import ShowProductImage
+from Production1copy import Product
 
 
 #EnterPassword = Username #"Ntm123456789!"                                                                    #VARIABLE JARDEL POUR LE MOT DE PASSE
@@ -148,27 +148,33 @@ class PageProduction(tk.Frame):
         #self.image = tk.PhotoImage(file="CodePython/CodeInProgressFich/poke.png")
 
         # Création de l'objet PhotoImage à partir du fichier image
-        self.prod1 = tk.PhotoImage(file="CodePython/CodeInProgressFich/poke.png")
-
-        tk.Label(self,image = self.prod1).pack(pady=10)
-
-
+        self.prod1 = tk.PhotoImage(file="CodePython/CodeInProgressFich/47.png").subsample(3)
+        tk.Label(self, image=self.prod1).pack(pady=10)
+        
+        
+        
         tk.Label(self, text="C'est la page de Production").pack(pady=10)
 
         
         if models_proxy:
 
             products = Product(models_proxy, 56 , Password, data_base)                                                                      # Récupération de tous les produits de la BDD (ID, Nom, Prix)
-        
 
         
         if products:
-
-            for product in products:                                                                                                  # Boucle pour écriture la liste dans la console
-                print(f"ID: {product.get('id')}")
-                SaveProductImage(models_proxy, "PokeFigDataBase", 56, Password, product.get('id'))                                                   # Enregistrement de l'image demandée
+            for product in products:
+                num = product.get('id')
+                print(f"ID: {num}")
+                
+                # Enregistrement de l'image demandée
+                ShowProductImage(self, models_proxy, "PokeFigDataBase", 56, Password, product.get('id'))
+                tk.Label(self, text="boucle").pack(pady=10)
+                
 
                 
+                
+                
+
 
         
         # Bouton pour revenir à la page d'accueil
