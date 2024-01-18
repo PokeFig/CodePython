@@ -105,7 +105,7 @@ def createManufOrder(models, quantity, product_id ):
 
 #--------------------------------------------------------------------
         
-def confirmManufOrder(models, order_id,quantity):
+def confirmManufOrder(models, order_id):
     model = 'mrp.production'
 
     values = {
@@ -128,7 +128,7 @@ def progessManufOrder(models, order_id,quantity):
 
     values = {
         'qty_produced': quantity,
-        #'state': 'progress'
+        'state': 'to_close'
     }
 
     try:
