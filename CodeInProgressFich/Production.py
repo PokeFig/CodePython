@@ -141,6 +141,21 @@ def DoneManufOrder(models, order_id,quantity
     except Exception as e:
         print(f"Erreur lors de la finalisation de l'ordre de fabrication: {e}")
 
+
+    model = 'stock.move'
+
+    values = {
+        'quantity_done': quantity
+          }
+
+    try:
+        models.execute_kw(database, gUid, password,
+                                    model, 'create', [values])
+
+        print(f"Enregistrement de mouvement de stock créé avec succès. ID: {order_id} - Ajout de {quantity} unités.")
+
+    except Exception as e:
+        print(f"Erreur lors de l'ajout d'unités au stock: {e}")
 #--------------------------------------------------------------------
         
 def CancelManufOrder(models, order_id):
