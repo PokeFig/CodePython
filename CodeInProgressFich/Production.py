@@ -7,7 +7,7 @@
 #######################################################################
 #======================================================================
 
-import base64
+import base64 , os
 import xmlrpc.client
 
 #======================================================================
@@ -69,8 +69,7 @@ def SaveProductImage(models, db, uid, password, product_id, save_path="/home/use
 def getManufOrderToDo(models):
     fields = ['name', 'date_planned_start', 'product_id', 'product_qty', 'qty_producing', 'state']
     limit = 10
-    mo_list = models.execute_kw(
-        database, gUid,
+    mo_list = models.execute_kw(database, gUid,
         'mrp.production', 'search_read',
         [[('state', '=', 'confirmed'), ('qty_produced', '!=', 'product_qty')]],
         {'fields': fields, 'limit': limit}
@@ -89,8 +88,6 @@ def getManufOrderToDo(models):
 def createManufOrder(models, quantity, product_id ):
     
     model = 'mrp.production'
-    
-    
    
     values = {
         'product_id': product_id,
@@ -98,7 +95,6 @@ def createManufOrder(models, quantity, product_id ):
     }
 
     try:
-        # Créez l'ordre de fabrication
         order_id = models.execute_kw(database, gUid, password,
                                      model, 'create', [values])
 
@@ -126,30 +122,13 @@ def confirmManufOrder(models, order_id):
         print(f"Erreur lors de la confirmation de l'ordre de fabrication: {e}")
 
 #--------------------------------------------------------------------
-
-def modifqttManufOrder(models, order_id,qty_produced):
-    model = 'mrp.production'
-
-    values = {
-        'qty_produced': qty_produced,
-    }
-
-    try:
-        models.execute_kw(database, gUid, password,
-                          model, 'write', [[order_id], values])
-
-        print(f"Ordre de fabrication #{order_id} à été produit avec #{qty_produced} produits.")
-
-    except Exception as e:
-        print(f"Erreur lors de la confirmation de l'ordre de fabrication: {e}")
-
-#--------------------------------------------------------------------
         
-def DoneManufOrder(models, order_id):
+def DoneManufOrder(models, order_id,qty_produced):
     model = 'mrp.production'
 
     values = {
         'state': 'done',
+        'quantity_done': qty_produced,
     }
 
     try:

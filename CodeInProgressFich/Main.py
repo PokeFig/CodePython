@@ -42,11 +42,10 @@ if __name__ == "__main__":
                 #ShowProductImage(, models_proxy, "PokeFigDataBase", 20, password, product.get('id'))                                                   # Enregistrement de l'image demandée
 
         
-     #Production.getManufOrderToDo(models_proxy)                                                                      #Récupération des OF
-     #Production.createManufOrder(models_proxy, quantity, product_id)                                           #Création des OF
-
-     Production.confirmManufOrder(models_proxy,order_id, quantity)                                                      #confirmation de l'OF
-     #Production.DoneManufOrder(models_proxy, order_id)                                                                 #Ordre de fabrication terminé
+     Production.getManufOrderToDo(models_proxy)                                                                      #Récupération des OF
+     #Production.createManufOrder(models_proxy, quantity, product_id)                                                 #Création des OF
+     #Production.confirmManufOrder(models_proxy,order_id)                                                             #confirmation de l'OF
+     #Production.DoneManufOrder(models_proxy, order_id,qty_produced)                                                                 #Ordre de fabrication terminé
      #Production.CancelManufOrder(models_proxy,order_id)
 
 #======================================================================
