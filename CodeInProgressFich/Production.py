@@ -123,13 +123,12 @@ def confirmManufOrder(models, order_id):
 
 #--------------------------------------------------------------------
         
-def DoneManufOrder(models, order_id,quantity
-                   ):
+def DoneManufOrder(models, order_id):
     model = 'mrp.production'
 
     values = {
         'state': 'done',
-        'quantity_done': quantity,
+        
     }
 
     try:
@@ -141,7 +140,9 @@ def DoneManufOrder(models, order_id,quantity
     except Exception as e:
         print(f"Erreur lors de la finalisation de l'ordre de fabrication: {e}")
 
-
+#--------------------------------------------------------------------
+        
+def addManufOrder(models, order_id,quantity):
     model = 'stock.move'
 
     values = {
@@ -150,7 +151,7 @@ def DoneManufOrder(models, order_id,quantity
 
     try:
         models.execute_kw(database, gUid, password,
-                                    model, 'create', [values])
+                                    model, 'create', [[order_id], values])
 
         print(f"Enregistrement de mouvement de stock créé avec succès. ID: {order_id} - Ajout de {quantity} unités.")
 
