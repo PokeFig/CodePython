@@ -170,5 +170,5 @@ def WriteStockage(product_id, new_quantity):                                    
 
 
 product_id_to_modify = 57                                                                           #Stockage_ID a modifier dans la base de donnée
-new_quantity_value = 50                                                                             #Quantité du produit
-WriteStockage(product_id_to_modify, new_quantity_value)                                             #
+new_quantity_value = 10                                                                             #Quantité du produit
+#WriteStockage(product_id_to_modify, new_quantity_value)                                            #Focntion block jardel
