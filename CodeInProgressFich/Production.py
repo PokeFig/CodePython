@@ -121,11 +121,14 @@ def confirmManufOrder(models, order_id,quantity):
     except Exception as e:
         print(f"Erreur lors de la confirmation de l'ordre de fabrication: {e}")
     
-
+#--------------------------------------------------------------------
+        
+def progessManufOrder(models, order_id,quantity):
     model = 'mrp.production'
 
     values = {
         'qty_produced': quantity,
+        'state': 'progress'
     }
 
     try:
