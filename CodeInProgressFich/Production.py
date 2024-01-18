@@ -135,10 +135,11 @@ def confirmManufOrder(models, order_id):
 
 #--------------------------------------------------------------------
         
-def DoneManufOrder(models, order_id):
+def DoneManufOrder(models, order_id,qty_produced):
     model = 'mrp.production'
 
     values = {
+        'qty_produced': qty_produced,
         'state': 'done',
     }
 
