@@ -12,9 +12,16 @@
 #======================================================================
 
 from odoo import Connect
+<<<<<<< HEAD
 from Production1copy import ShowProductImage
 from Production1copy import Product
 #from Production1 import getManufOrderToDo
+=======
+from Production import SaveProductImage
+from Production import Product
+from Production import getManufOrderToDo
+from Production import createManufOrder
+>>>>>>> 2ad032a2bcf2ae622ea5bfe59d1b000b469b6175
 
 models_proxy = Connect(server_ip="172.31.10.64", server_port=8069, password="Ntm123456789!",)
 
@@ -30,16 +37,23 @@ if __name__ == "__main__":
 
     if models_proxy:
 
-        products = Product(models_proxy, 20, password, database)                                                                      # Récupération de tous les produits de la BDD (ID, Nom, Prix)
+        #products = Product(models_proxy, 20, password, database)                                                                      # Récupération de tous les produits de la BDD (ID, Nom, Prix)
         
         
-        if products:
+        #if products:
 
+<<<<<<< HEAD
             for product in products:                                                                                                  # Boucle pour écriture la liste dans la console
                 print(f"ID: {product.get('id')}")
                 ShowProductImage(, models_proxy, "PokeFigDataBase", 20, password, product.get('id'))                                                   # Enregistrement de l'image demandée
+=======
+            #for product in products:                                                                                                  # Boucle pour écriture la liste dans la console
+                #print(f"ID: {product.get('id')}")
+                #SaveProductImage(models_proxy, "PokeFigDataBase", 20, password, product.get('id'))                                                   # Enregistrement de l'image demandée
+>>>>>>> 2ad032a2bcf2ae622ea5bfe59d1b000b469b6175
 
         
-    #getManufOrderToDo(models_proxy)
+     #getManufOrderToDo(models_proxy)
+     createManufOrder(models_proxy, product_id=47, quantity=1)
 
 #======================================================================

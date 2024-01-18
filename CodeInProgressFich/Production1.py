@@ -79,3 +79,26 @@ def getManufOrderToDo(models):
         print("Aucun ordre de fabrication trouvé ou une erreur est survenue.")
 
 #--------------------------------------------------------------------
+        
+def createManufOrder(models, product_id, quantity):
+    
+    model = 'mrp.production'
+    
+    
+   
+    values = {
+        'product_id': product_id,
+        'product_qty': quantity,
+        'state' : 'confirmed',
+    }
+
+    try:
+        # Créez l'ordre de fabrication
+        order_id = models.execute_kw(database, gUid, password,
+                                     model, 'create', [values])
+
+        print(f"Ordre de fabrication créé avec succès. ID: {order_id}  et {quantity} produits à fabriqué à l'état :{'state'}")
+'
+    except Exception as e:
+        print(f"Erreur lors de la création de l'ordre de fabrication: {e}")
+  

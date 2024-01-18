@@ -74,18 +74,6 @@ def getFields():                                                                
     #else:
         #print(f'Odoo server authentification rejected : DB = {data_base} User ={uid}')
 
-def AiguillageFields():
-
-    if listing_acces is not None:
-        for attr in listing_acces:
-            if 'product_id' in str(attr):
-                print(f"Nom trouvé Production")
-                ProfilType = 'Production'
-                return True
-            
-    print(f"Nom  non trouvé")
-    ProfilType = 'logistique'
-    return False
 
 
 #########################################################################################################################
