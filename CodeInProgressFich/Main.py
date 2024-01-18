@@ -23,9 +23,9 @@ models_proxy = Connect(server_ip="172.31.10.64", server_port=8069, password="Ntm
 
 password = "Ntm123456789!"
 database = "PokeFigDataBase"
-order_id = 30     
+order_id = 31     
 quantity = 10                                                                                      
-product_id = 56
+product_id = 57
 
 #======================================================================
 if __name__ == "__main__":
@@ -46,7 +46,7 @@ if __name__ == "__main__":
      #Production.createManufOrder(models_proxy, quantity, product_id)                                                 #Création des OF
      #Production.confirmManufOrder(models_proxy,order_id)                                                             #confirmation de l'OF
      #Production.progessManufOrder(models_proxy,order_id, quantity)
-     Production.DoneManufOrder(models_proxy, order_id)                                                               #Ordre de fabrication terminé
+     #Production.DoneManufOrder(models_proxy, order_id)                                                               #Ordre de fabrication terminé
      #Production.CancelManufOrder(models_proxy,order_id)
 
 #======================================================================
