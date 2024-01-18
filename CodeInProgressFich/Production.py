@@ -105,7 +105,7 @@ def createManufOrder(models, quantity, product_id ):
 
 #--------------------------------------------------------------------
         
-def confirmManufOrder(models, order_id):
+def confirmManufOrder(models, order_id,quantity):
     model = 'mrp.production'
 
     values = {
@@ -120,14 +120,27 @@ def confirmManufOrder(models, order_id):
 
     except Exception as e:
         print(f"Erreur lors de la confirmation de l'ordre de fabrication: {e}")
+    
+
+    values = {
+        'state': 'progress',
+        #'qty_produced': quantity,
+    }
+
+    try:
+        models.execute_kw(database, gUid, password,
+                          model, 'write', [[order_id], values])
+
+        print(f"Ordre de fabrication #{order_id} confirmé avec succès.")
+
+    except Exception as e:
+        print(f"Erreur lors de la confirmation de l'ordre de fabrication: {e}")
 
 #--------------------------------------------------------------------
         
-def DoneManufOrder(models, order_id,quantity):
+def DoneManufOrder(models, order_id):
     model = 'mrp.production'
-    'Poduct_qty': quantity
     
-
     try:
         # Appel à la méthode button_mark_done pour terminer l'ordre de fabrication
         models.execute_kw(database, gUid, password,
