@@ -7,13 +7,24 @@
 #######################################################################
 #======================================================================
 
-import base64, os
+import base64
+import xmlrpc
 
+#======================================================================
 
-gUid = None
-gUrl = None
 password = "Ntm123456789!"
 database = "PokeFigDataBase"
+
+server_ip="172.31.10.64"
+server_port=8069
+
+gUrl = f"http://{server_ip}:{server_port}/xmlrpc/2/common"
+
+common_proxy = xmlrpc.client.ServerProxy(gUrl)   
+
+gUid = common_proxy.authenticate("PokeFigDataBase", "paimblancleo@gmail.com", password, {})
+
+
 
 #======================================================================
 
