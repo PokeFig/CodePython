@@ -122,9 +122,10 @@ def confirmManufOrder(models, order_id,quantity):
         print(f"Erreur lors de la confirmation de l'ordre de fabrication: {e}")
     
 
+
     values = {
         'state': 'progress',
-        #'qty_produced': quantity,
+        'qty_produced': quantity,
     }
 
     try:
