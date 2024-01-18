@@ -109,11 +109,10 @@ def createManufOrder(models, quantity, product_id ):
 
 #--------------------------------------------------------------------
         
-def confirmManufOrder(models, order_id,qty_produced):
+def confirmManufOrder(models, order_id):
     model = 'mrp.production'
 
     values = {
-        'qty_produced': qty_produced,
         'state': 'confirmed',
     }
 
@@ -122,6 +121,24 @@ def confirmManufOrder(models, order_id,qty_produced):
                           model, 'write', [[order_id], values])
 
         print(f"Ordre de fabrication #{order_id} confirmé avec succès.")
+
+    except Exception as e:
+        print(f"Erreur lors de la confirmation de l'ordre de fabrication: {e}")
+
+#--------------------------------------------------------------------
+
+def modifqttManufOrder(models, order_id,qty_produced):
+    model = 'mrp.production'
+
+    values = {
+        'qty_produced': qty_produced,
+    }
+
+    try:
+        models.execute_kw(database, gUid, password,
+                          model, 'write', [[order_id], values])
+
+        print(f"Ordre de fabrication #{order_id} à été produit avec #{qty_produced} produits.")
 
     except Exception as e:
         print(f"Erreur lors de la confirmation de l'ordre de fabrication: {e}")
