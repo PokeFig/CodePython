@@ -33,19 +33,19 @@ if __name__ == "__main__":
 
     if models_proxy:
 
-        #products = Product(models_proxy, 20, password, database)                                                                      # Récupération de tous les produits de la BDD (ID, Nom, Prix)
+        products = Production.Product(models_proxy, 20, password, database)                                                                      # Récupération de tous les produits de la BDD (ID, Nom, Prix)
         
         
-        #if products:
+        if products:
 
-            #for product in products:                                                                                                  # Boucle pour écriture la liste dans la console
-                #print(f"ID: {product.get('id')}")
+            for product in products:                                                                                                  # Boucle pour écriture la liste dans la console
+                print(f"ID: {product.get('id')}")
                 #SaveProductImage(models_proxy, "PokeFigDataBase", 20, password, product.get('id'))                                                   # Enregistrement de l'image demandée
 
         
-     Production.getManufOrderToDo(models_proxy)
-     Production.createManufOrder(models_proxy, product_id=48, quantity=1)
+    Production.getManufOrderToDo(models_proxy)
+    Production.createManufOrder(models_proxy, product_id=57, quantity=1)
 
-     Production.confirmManufOrder(models_proxy,order_id)
+     #Production.confirmManufOrder(models_proxy,order_id)
 
 #======================================================================
