@@ -142,7 +142,7 @@ def DoneManufOrder(models, order_id):
 
 #--------------------------------------------------------------------
         
-def addManufOrder(models,quantity,order_id):
+def ManufOrder(models,quantity,order_id):
     model = 'stock.move'
 
     values = {
