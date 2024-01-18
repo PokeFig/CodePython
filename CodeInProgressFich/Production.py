@@ -117,7 +117,7 @@ def createManufOrder(models, product_id, quantity):
 
 #--------------------------------------------------------------------
         
-#def confirmManufOrder(models, order_id):
+def confirmManufOrder(models, order_id):
     model = 'mrp.production'
 
     values = {
@@ -134,6 +134,4 @@ def createManufOrder(models, product_id, quantity):
     except Exception as e:
         print(f"Erreur lors de la confirmation de l'ordre de fabrication: {e}")
 
-# Exemple d'utilisation de la fonction pour confirmer un ordre de fabrication
-# Remplacez 'order_id' par l'ID de l'ordre de fabrication que vous souhaitez confirmer
   
