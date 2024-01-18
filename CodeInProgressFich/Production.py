@@ -9,6 +9,7 @@
 
 import base64 , os
 import xmlrpc.client
+import CodeStockageJardel
 
 #======================================================================
 
@@ -22,19 +23,6 @@ common_proxy = xmlrpc.client.ServerProxy(gUrl)
 gUid = common_proxy.authenticate("PokeFigDataBase", "paimblancleo@gmail.com", password, {})
 
 #======================================================================
-
-def Product(models, gUid, password, database):
-    try:
-        product_ids = models.execute_kw( database, gUid, password,
-                                        'product.template', 'search_read',
-                                        [[]],
-                                        {'fields': ['default_code']})
-        return product_ids if product_ids else None
-    except Exception as e:
-        print(f"Erreur lors de la recherche des produits : {e}")
-        return None
-
-#-------------------------------------------------------------------
 
 def SaveProductImage(models, db, uid, password, product_id, save_path="/home/user/Documents/clone/CodePython/CodeInProgressFich/"):
     try:
@@ -123,36 +111,19 @@ def confirmManufOrder(models, order_id):
     
 #--------------------------------------------------------------------
         
-def progessManufOrder(models, order_id,quantity):
+def DoneManufOrder(models, order_id,product_id):
     model = 'mrp.production'
 
     values = {
-        'qty_produced': quantity,
-        'state': 'to_close'
-    }
-
-    try:
-        models.execute_kw(database, gUid, password,
-                          model, 'write', [[order_id], values])
-
-        print(f"Ordre de fabrication #{order_id} confirmé avec succès.")
-
-    except Exception as e:
-        print(f"Erreur lors de la confirmation de l'ordre de fabrication: {e}")
-
-#--------------------------------------------------------------------
-        
-def DoneManufOrder(models, order_id,quantity):
-    model = 'mrp.production'
-
-    values = {
-        'qty_produced': quantity,
         'state': 'done'
+        
     }
 
     try:
         models.execute_kw(database, gUid, password,
                           model, 'write', [[order_id], values])
+
+        
 
         print(f"Ordre de fabrication #{order_id} terminé avec succès.")
 
