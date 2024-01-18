@@ -45,8 +45,8 @@ if __name__ == "__main__":
      #Production.getManufOrderToDo(models_proxy)                                                                      #Récupération des OF
      #Production.createManufOrder(models_proxy, quantity, product_id)                                                 #Création des OF
      #Production.confirmManufOrder(models_proxy,order_id)                                                             #confirmation de l'OF
-     Production.ManufOrder(models_proxy,order_id, quantity)
-     #Production.DoneManufOrder(models_proxy, order_id)                                                                 #Ordre de fabrication terminé
+     Production.addUnitsToStock(models_proxy, 56, quantity, location_id=2)
+     #Production.DoneManufOrder(models_proxy, order_id)                                                               #Ordre de fabrication terminé
      #Production.CancelManufOrder(models_proxy,order_id)
 
 #======================================================================

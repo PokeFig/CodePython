@@ -142,23 +142,6 @@ def DoneManufOrder(models, order_id):
 
 #--------------------------------------------------------------------
         
-def ManufOrder(models,quantity,order_id):
-    model = 'stock.move'
-
-    values = {
-        'quantity_done': quantity,
-          }
-
-    try:
-        models.execute_kw(database, gUid, password,
-                                    model, 'create', [[order_id], values])
-
-        print(f"Enregistrement de mouvement de stock créé avec succès. ID: {order_id} - Ajout de {quantity} unités.")
-
-    except Exception as e:
-        print(f"Erreur lors de l'ajout d'unités au stock: {e}")
-#--------------------------------------------------------------------
-        
 def CancelManufOrder(models, order_id):
     model = 'mrp.production'
 
@@ -175,4 +158,24 @@ def CancelManufOrder(models, order_id):
     except Exception as e:
         print(f"Erreur lors de l'annualtion de l'ordre de fabrication: {e}")
 
-  
+  #--------------------------------------------------------------------
+        
+def addUnitsToStock(models, product_id, quantity, location_id):
+    model = 'stock.move'
+
+    values = {
+        'product_id': product_id,
+        'location_id': location_id,
+        'quantity_done': quantity,
+        # Ajoutez d'autres champs requis selon votre besoin
+    }
+
+    try:
+        # Créez un nouvel enregistrement de mouvement de stock pour ajouter X unités au stock
+        move_id = models.execute_kw(database, gUid, password,
+                                    model, 'create', [values])
+
+        print(f"Enregistrement de mouvement de stock créé avec succès. ID: {move_id} - Ajout de {quantity} unités.")
+
+    except Exception as e:
+        print(f"Erreur lors de l'ajout d'unités au stock: {e}")
