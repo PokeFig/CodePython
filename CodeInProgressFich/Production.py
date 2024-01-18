@@ -161,7 +161,7 @@ def CancelManufOrder(models, order_id):
 #--------------------------------------------------------------------
         
 def addUnitsToStock(models, product_id, quantity):
-    model = 'stock.move'
+    model = 'stock.add'
 
     values = {
         'product_id': product_id,
