@@ -151,4 +151,22 @@ def DoneManufOrder(models, order_id):
     except Exception as e:
         print(f"Erreur lors de la finalisation de l'ordre de fabrication: {e}")
 
+#--------------------------------------------------------------------
+        
+def CancelManufOrder(models, order_id):
+    model = 'mrp.production'
+
+    values = {
+        'state': 'cancel',
+    }
+
+    try:
+        models.execute_kw(database, gUid, password,
+                          model, 'write', [[order_id], values])
+
+        print(f"Ordre de fabrication #{order_id} annulé avec succès.")
+
+    except Exception as e:
+        print(f"Erreur lors de l'annualtion de l'ordre de fabrication: {e}")
+
   
