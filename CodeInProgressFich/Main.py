@@ -41,7 +41,8 @@ if __name__ == "__main__":
      #Production.confirmManufOrder(models_proxy,order_id)                                                             #confirmation de l'OF
      #Production.DoneManufOrder(models_proxy, order_id,)                                                               #Ordre de fabrication terminé
      #Production.CancelManufOrder(models_proxy,order_id)
-     CodeStockageJardel.stock_info_list.get('quantity')
-     print(CodeStockageJardel.stock_info_list.get('quantity'))
+     Production.ModifStockage(models_proxy,product_id, quantity)
+
+     
 
 #======================================================================
