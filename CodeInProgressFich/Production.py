@@ -111,9 +111,8 @@ def confirmManufOrder(models, order_id):
     
 #--------------------------------------------------------------------
         
-def DoneManufOrder(models, order_id):
+def DoneManufOrder(models, order_id,product_id,quantity):
     model = 'mrp.production'
-
     
     values = {
         'state': 'done'
@@ -124,10 +123,38 @@ def DoneManufOrder(models, order_id):
         models.execute_kw(database, gUid, password,
                           model, 'write', [[order_id], values])
 
-        
-    
-
         print(f"Ordre de fabrication #{order_id} terminé avec succès.")
+
+        try:
+            # Recherche du stock du produit
+            stock_Modification_id = models.execute_kw(database, gUid, password,
+                                     'stock.quant', 'search',
+                                     [[('product_id', '=', product_id)]])
+        
+            # Modification du stock
+            if stock_Modification_id:
+                # Extraire l'ID du premier élément de la liste
+                stock_id_to_modify = stock_Modification_id[0]
+            
+                # Obtenir la quantité actuelle du stock
+                current_quantity = models.execute_kw(database, gUid, password,
+                                                 'stock.quant', 'read',
+                                                 [stock_id_to_modify], {'fields': ['quantity']})[0]['quantity']
+            
+                # Effectuer l'opération d'addition
+                new_quantity = current_quantity + quantity
+            
+                # Mettre à jour la quantité du stock
+                models.execute_kw(database, gUid, password,
+                              'stock.quant', 'write',
+                              [[stock_id_to_modify], {'quantity': new_quantity}])
+            
+                print(f"Stock du produit avec l'ID {product_id} modifié avec succès.")
+            else:
+                print(f"Aucun stock trouvé pour le produit avec l'ID {product_id}.")
+
+        except Exception as e:
+            print(f"Erreur lors de la modification du stock : {e}")
 
     except Exception as e:
         print(f"Erreur lors de la terminaison de l'ordre de fabrication: {e}")
