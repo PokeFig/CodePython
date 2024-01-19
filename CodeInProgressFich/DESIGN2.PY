@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-import xmlrpc.client
+from PIL import Image, ImageTk
+import xmlrpc.client, time
 from odoo import Connect
 from Production1copy import ShowProductImage
 from Production1copy import Product
@@ -20,7 +21,6 @@ data_base = "PokeFigDataBase"                                                   
 #Email = EnterEmail                                                                                 #Gestion de l'identifiant
 url = f'http://{server_ip}:{server_port}'
 uid = None
-
 
 class SharedData:
     def __init__(self):
@@ -43,7 +43,7 @@ class Pageconnect(tk.Frame):
         content_frame = ttk.Frame(self)
 
         #image_path = "CodePython/CodeInProgressFich/poke.png"
-        self.image = tk.PhotoImage(file="CodePython/CodeInProgressFich/poke.png")
+        self.image = tk.PhotoImage(file="/home/user/Documents/clone/CodePython/CodeInProgressFich/poke.png")
 
         # Créer un Label pour afficher l'image
         image_label = tk.Label(self, image=self.image, background="#33c4ff")
@@ -145,46 +145,49 @@ class PageProduction(tk.Frame):
         self.master = master
         self.callback = callback
         self.shared_data = shared_data
+        self.prod_images = []  # Liste pour stocker les objets PhotoImage
+        
+
         models_proxy = Connect(server_ip="172.31.10.64", server_port=8069, password="Ntm123456789!",)
         #self.image = tk.PhotoImage(file="CodePython/CodeInProgressFich/poke.png")
 
-        # Création de l'objet PhotoImage à partir du fichier image
-        self.prod1 = tk.PhotoImage(file="CodePython/CodeInProgressFich/47.png").subsample(3)
-        tk.Label(self, image=self.prod1).pack(pady=10)
-        
-        
-        
-        tk.Label(self, text="C'est la page de Production").pack(pady=10)
+        # Création de la bande bleue avec le texte "PokeFig"
+        header_frame = tk.Frame(self, bg="#33c4ff")
+        header_frame.grid(row=0, column=0, columnspan=100, sticky="ew")
 
-        
+        tk.Label(header_frame, text="PokeFig", font=('Times New Roman', 32, 'bold'), foreground="#F1A226", background="#33c4ff").pack(pady=0)
+
         if models_proxy:
+            products = Product(models_proxy, 56, Password, data_base)
 
-            products = Product(models_proxy, 56 , Password, data_base)                                                                      # Récupération de tous les produits de la BDD (ID, Nom, Prix)
-
-        
         if products:
+            x = 5
             for product in products:
                 num = product.get('id')
                 print(f"ID: {num}")
-                
+
                 # Enregistrement de l'image demandée
-                ShowProductImage(self, models_proxy, "PokeFigDataBase", 56, Password, product.get('id'))
-                tk.Label(self, text="boucle").pack(pady=10)
+                Image = ShowProductImage(self, models_proxy, "PokeFigDataBase", 56, Password, product.get('id'))
+                image_resize = Image.resize((160, 160))
+                tk_image = ImageTk.PhotoImage(image_resize)
+                self.prod_images.append(tk_image)  # Stocker l'objet PhotoImage
 
+                # Afficher l'image dans une fenêtre Tkinter
+                label = tk.Label(self, image=tk_image)
+                label.grid(row=3, column=x)
+                self.update_idletasks()
+
+                tk.Label(self, text="boucle").grid(row=4, column=x)
                 self.update_idletasks()  # Ajout de la mise à jour de la fenêtre
+                x += 1
 
-                
-                
-                
-
-
-        
         # Bouton pour revenir à la page d'accueil
-        tk.Button(self, text="Déconnexion", command=self.deco).pack(pady=10)
+        tk.Button(self, text="Déconnexion", command=self.deco).grid(column=0, columnspan=100)
 
         # Afficher un bouton supplémentaire si l'utilisateur est "Mister-J23"
         if ProfilType == "administrateur":
-            tk.Button(self, text="Page Logistique", command=self.go_logic).pack(pady=10)
+            tk.Button(self, text="Page Logistique", command=self.go_logic).grid()
+        
 
 
     def deco(self):
@@ -235,13 +238,11 @@ class Application(tk.Tk):
         super().__init__()
 
         self.title("PokeFig")
-        self.geometry("800x600")
+        self.geometry("800x600")  # Définir la taille initiale
 
         self.shared_data = SharedData()
         self.page_actuelle = None
         self.changer_page(Pageconnect, self.shared_data)
-
-    
 
     def changer_page(self, classe_page, shared_data):
         nouvelle_page = classe_page(self, self.changer_page, shared_data)
@@ -255,3 +256,4 @@ class Application(tk.Tk):
 if __name__ == "__main__":
     app = Application()
     app.mainloop()
+
