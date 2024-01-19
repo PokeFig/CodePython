@@ -21,6 +21,7 @@ data_base = "PokeFigDataBase"                                                   
 url = f'http://{server_ip}:{server_port}'
 uid = None
 
+
 class SharedData:
     def __init__(self):
         self.user = tk.StringVar()
