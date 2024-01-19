@@ -57,7 +57,7 @@ def SaveProductImage(models, db, uid, password, product_id, save_path="/home/use
 def getManufOrderToDo(models):
     fields = ['name', 'date_planned_start', 'product_id', 'product_qty', 'qty_producing', 'state']
     limit = 10
-    mo_list = models.execute_kw(database, gUid,
+    mo_list = models.execute_kw(database, gUid, password,
         'mrp.production', 'search_read',
         [[('state', '=', 'confirmed'), ('qty_produced', '!=', 'product_qty')]],
         {'fields': fields, 'limit': limit}
