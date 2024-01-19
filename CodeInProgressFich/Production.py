@@ -211,3 +211,29 @@ def ModifStockage(models,product_id, quantity):                                 
 
     except Exception as e:
         print(f"Erreur lors de la modification du stock : {e}")
+
+#--------------------------------------------------------------------
+
+def ModifOF(models, order_id, product_qty):
+    try:
+        # Recherche de l'OF
+        of_search_id = models.execute_kw(database, gUid, password,
+                                        'mrp.production', 'search',
+                                        [[('id', '=', order_id)]])
+        
+        # Modification de la quantité de l'OF
+        if of_search_id:
+            # Extraire l'ID du premier élément de la liste
+            of_id_to_modify = of_search_id[0]
+            
+            # Mettre à jour la quantité de l'OF
+            models.execute_kw(database, gUid, password,
+                              'mrp.production', 'write',
+                              [[of_id_to_modify], {'product_qty': product_qty}])
+            
+            print(f"Quantité de l'OF avec l'ID {order_id} modifiée avec succès.")
+        else:
+            print(f"Aucun OF trouvé avec l'ID {order_id}.")
+
+    except Exception as e:
+        print(f"Erreur lors de la modification de l'OF : {e}")
