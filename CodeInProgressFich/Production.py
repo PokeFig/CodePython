@@ -101,7 +101,9 @@ def getManufOrderToDo(models):
         for mo_dico in mo_list:
             print(f'----------------------------')
             for k in mo_dico.keys():
-                print(f' - {k} : {mo_dico[k]}')
+                text = f' - {k} : {mo_dico[k]}'
+                print(text)
+                return text
     else:
         print("Aucun ordre de fabrication trouvé ou une erreur est survenue.")
 

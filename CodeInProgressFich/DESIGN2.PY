@@ -1,9 +1,10 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, Label
 from PIL import Image, ImageTk
 import xmlrpc.client, time
 from odoo import Connect
-from Production import ShowProductImage, Product
+from Production1copy import ShowProductImage, Product
+from Production1copy import getManufOrderToDo
 
 
 #EnterPassword = Username #"Ntm123456789!"                                                                    #VARIABLE JARDEL POUR LE MOT DE PASSE
@@ -145,11 +146,9 @@ class PageProduction(tk.Frame):
         self.callback = callback
         self.shared_data = shared_data
         self.prod_images = []  # Liste pour stocker les objets PhotoImage
-        
 
         models_proxy = Connect(server_ip="172.31.10.64", server_port=8069, password="Ntm123456789!",)
-        #self.image = tk.PhotoImage(file="CodePython/CodeInProgressFich/poke.png")
-
+        
         # Création de la bande bleue avec le texte "PokeFig"
         header_frame = tk.Frame(self, bg="#33c4ff")
         header_frame.grid(row=0, column=0, columnspan=100, sticky="ew")
@@ -172,13 +171,17 @@ class PageProduction(tk.Frame):
                 self.prod_images.append(tk_image)  # Stocker l'objet PhotoImage
 
                 # Afficher l'image dans une fenêtre Tkinter
-                label = tk.Label(self, image=tk_image)
-                label.grid(row=3, column=x)
-                self.update_idletasks()
+                labelimg = tk.Label(self, image=tk_image)
+                labelimg.grid(row=3, column=x, pady=10)
 
-                tk.Label(self, text="boucle").grid(row=4, column=x)
-                self.update_idletasks()  # Ajout de la mise à jour de la fenêtre
-                x += 1
+                # Afficher les informations à côté de l'image
+                order_info_text = getManufOrderToDo(models_proxy, product)
+                info_label = Label(self, text=order_info_text, justify="left")
+                info_label.grid(row=3, column=x + 1, pady=10)
+
+                self.update_idletasks()
+                x += 2  # Pour éviter que les informations se superposent avec la colonne suivante
+
 
         # Bouton pour revenir à la page d'accueil
         tk.Button(self, text="Déconnexion", command=self.deco).grid(column=0, columnspan=100)
@@ -186,14 +189,6 @@ class PageProduction(tk.Frame):
         # Afficher un bouton supplémentaire si l'utilisateur est "Mister-J23"
         if ProfilType == "administrateur":
             tk.Button(self, text="Page Logistique", command=self.go_logic).grid()
-        
-
-
-    def deco(self):
-        self.callback(Pageconnect, self.shared_data)
-
-    def go_logic(self):
-        self.callback(PageLogistique, self.shared_data)
 
 class PageLogistique(tk.Frame):
     def __init__(self, master, callback, shared_data):

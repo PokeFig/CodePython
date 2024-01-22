@@ -56,6 +56,25 @@ def ShowProductImage(self, models, db, uid, password, product_id):
 
 
 #-------------------------------------------------------------------
+def getManufOrderToDo(models):
+    fields = ['name', 'date_planned_start', 'product_id', 'product_qty', 'qty_producing', 'state']
+    limit = 10
+    mo_list = models.execute_kw(database, gUid, password,
+        'mrp.production', 'search_read',
+        [[('state', '=', 'confirmed'), ('qty_produced', '!=', 'product_qty')]],
+        {'fields': fields, 'limit': limit}
+    )
+
+    if mo_list:
+        result_text = ""
+        for mo_dico in mo_list:
+            result_text += '----------------------------\n'
+            for k in mo_dico.keys():
+                text = f' - {k} : {mo_dico[k]}\n'
+                result_text += text
+        return result_text
+    else:
+        return "Aucun ordre de fabrication trouvé ou une erreur est survenue."
 
 
 
