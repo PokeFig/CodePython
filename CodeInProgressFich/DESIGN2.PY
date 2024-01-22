@@ -3,8 +3,7 @@ from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
 import xmlrpc.client, time
 from odoo import Connect
-from Production1copy import ShowProductImage
-from Production1copy import Product
+from Production import ShowProductImage, Product
 
 
 #EnterPassword = Username #"Ntm123456789!"                                                                    #VARIABLE JARDEL POUR LE MOT DE PASSE
