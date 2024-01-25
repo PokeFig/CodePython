@@ -95,6 +95,7 @@ class Pageconnect(tk.Frame):
                 print(f"Erreur de connexion à Odoo {common_proxy.version()}")                             #Retour d'information du serveur
         
         except Exception as e:
+
             print(f"Erreur de connexion à Odoo : {e}")                                                 #Retour du code erreur si pas de connexion avec le serveur
             print("Échec Connexion")
             ConnectionCheck = False
@@ -119,9 +120,10 @@ class Pageconnect(tk.Frame):
                 self.callback(PageProduction, self.shared_data)
 
         except:
-            print(f"Profil logistique")  
-            ProfilType = 'logistique'
-            self.callback(PageLogistique, self.shared_data)
+            #print(f"Profil logistique")  
+            #ProfilType = 'logistique'
+            #self.callback(PageLogistique, self.shared_data)
+             messagebox.showinfo("Erreur", "Aucun droit")
 
 
 
@@ -145,7 +147,7 @@ class PageProduction(tk.Frame):
         self.master = master
         self.callback = callback
         self.shared_data = shared_data
-        self.prod_images = []  # Liste pour stocker les objets PhotoImage
+        self.prod_frames = []  # Liste pour stocker les cadres des produits
 
         models_proxy = Connect(server_ip="172.31.10.64", server_port=8069, password="Ntm123456789!",)
         
@@ -164,24 +166,28 @@ class PageProduction(tk.Frame):
                 num = product.get('id')
                 print(f"ID: {num}")
 
+                # Création d'un cadre pour chaque produit
+                product_frame = tk.Frame(self)
+                product_frame.grid(row=3, column=x, pady=10)
+
                 # Enregistrement de l'image demandée
                 Image = ShowProductImage(self, models_proxy, "PokeFigDataBase", 56, Password, product.get('id'))
                 image_resize = Image.resize((160, 160))
                 tk_image = ImageTk.PhotoImage(image_resize)
-                self.prod_images.append(tk_image)  # Stocker l'objet PhotoImage
 
-                # Afficher l'image dans une fenêtre Tkinter
-                labelimg = tk.Label(self, image=tk_image)
-                labelimg.grid(row=3, column=x, pady=10)
+                # Afficher l'image dans le cadre du produit
+                labelimg = tk.Label(product_frame, image=tk_image)
+                labelimg.pack()
 
-                # Afficher les informations à côté de l'image
+                # Afficher les informations à côté de l'image dans le cadre du produit
                 order_info_text = getManufOrderToDo(models_proxy, product)
-                info_label = Label(self, text=order_info_text, justify="left")
-                info_label.grid(row=3, column=x + 1, pady=10)
+                info_label = tk.Label(product_frame, text=order_info_text, justify="left")
+                info_label.pack()
+
+                self.prod_frames.append(product_frame)  # Stocker le cadre du produit
 
                 self.update_idletasks()
                 x += 2  # Pour éviter que les informations se superposent avec la colonne suivante
-
 
         # Bouton pour revenir à la page d'accueil
         tk.Button(self, text="Déconnexion", command=self.deco).grid(column=0, columnspan=100)
@@ -189,6 +195,7 @@ class PageProduction(tk.Frame):
         # Afficher un bouton supplémentaire si l'utilisateur est "Mister-J23"
         if ProfilType == "administrateur":
             tk.Button(self, text="Page Logistique", command=self.go_logic).grid()
+
 
 class PageLogistique(tk.Frame):
     def __init__(self, master, callback, shared_data):
