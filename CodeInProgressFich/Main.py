@@ -15,7 +15,6 @@ from odoo import Connect
 import Production
 import CodeStockageJardel
 
-
 models_proxy = Connect(server_ip="169.254.178.173", server_port="8069", password="Ntm123456789!")
 
 #======================================================================
