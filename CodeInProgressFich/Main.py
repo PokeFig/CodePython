@@ -16,7 +16,7 @@ import Production
 import CodeStockageJardel
 
 
-models_proxy = Connect(server_ip="192.168.0.110", server_port=8069, password="Ntm123456789!",)
+models_proxy = Connect(server_ip="169.254.178.173", server_port="8069", password="Ntm123456789!")
 
 #======================================================================
 #Déclaration de varaibles global
