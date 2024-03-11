@@ -15,7 +15,7 @@ from odoo import Connect
 import Production
 import CodeStockageJardel
 
-models_proxy = Connect(server_ip="169.254.178.173", server_port="8069", password="Ntm123456789!")
+models_proxy = Connect(server_ip="172.18.0.1", server_port="8069", password="Ntm123456789!")
 
 #======================================================================
 #Déclaration de varaibles global
@@ -24,7 +24,7 @@ models_proxy = Connect(server_ip="169.254.178.173", server_port="8069", password
 password = "Ntm123456789!"
 database = "PokeFigDataBase"
 order_id = 36                   #Numéro de l'of pour modif
-quantity = 15                   #QUAntitée qu'on veux produire
+quantity = 20                   #QUAntitée qu'on veux produire
 product_id = 55                 #Numéro de produit
 
 #======================================================================
@@ -33,8 +33,13 @@ if __name__ == "__main__":
     if models_proxy:
      
      #ShowProductImage(, models_proxy, "PokeFigDataBase", 20, password, product.get('id'))                                                       # Enregistrement de l'image demandée
-        
-     Production.getManufOrderToDo(models_proxy)                                                                                                 #Récupération des OF
+     
+        try:
+            Production.ModifOF(models_proxy, order_id, quantity)
+        except Exception as e:
+            print("Une erreur s'est produite :", e)
+
+     #Production.getManufOrderToDo(models_proxy,['name', 'date_planned_start', 'product_id', 'product_qty', 'qty_producing', 'state'],10)                                                                                                 #Récupération des OF
      #Production.createManufOrder(models_proxy, quantity, product_id)                                                                            #Création des OF
      #Production.confirmManufOrder(models_proxy,order_id)                                                                                        #Confirmation de l'OF
      #Production.DoneManufOrder(models_proxy,order_id,product_id,quantity)                                                                       #Ordre de fabrication terminé

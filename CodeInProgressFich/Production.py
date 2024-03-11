@@ -6,6 +6,8 @@
 # Autor : L.P                                                         #
 #######################################################################
 #======================================================================
+import tkinter as tk
+from tkinter import ttk, messagebox
 from PIL import Image
 import base64 , os, io
 import xmlrpc.client
@@ -13,7 +15,7 @@ import CodeStockageJardel
 
 #======================================================================
 
-server_ip="172.31.10.64"
+server_ip="172.18.0.1"
 server_port=8069
 password = "Ntm123456789!"
 database = "PokeFigDataBase"
@@ -98,14 +100,19 @@ def getManufOrderToDo(models):
     )
 
     if mo_list:
+        result_text = ""
+
         for mo_dico in mo_list:
-            print(f'----------------------------')
+            result_text += '----------------------------\n'
             for k in mo_dico.keys():
-                text = f' - {k} : {mo_dico[k]}'
-                print(text)
-                return text
+                text = f' - {k} : {mo_dico[k]}\n'
+                result_text += text
+        return result_text
+        print(result_text)
     else:
-        print("Aucun ordre de fabrication trouvé ou une erreur est survenue.")
+        return "Aucun ordre de fabrication trouvé ou une erreur est survenue."
+
+
 
 #--------------------------------------------------------------------
         
@@ -268,6 +275,7 @@ def ModifOF(models, order_id, product_qty):
                               [[of_id_to_modify], {'product_qty': product_qty}])
             
             print(f"Quantité de l'OF avec l'ID {order_id} modifiée avec succès.")
+            messagebox.showinfo("Succès", "L'OF: {} modifié avec succès".format(order_id))
         else:
             print(f"Aucun OF trouvé avec l'ID {order_id}.")
 
