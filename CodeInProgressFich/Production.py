@@ -257,7 +257,7 @@ def ModifStockage(models,product_id, quantity):                                 
 
 #--------------------------------------------------------------------
 
-def ModifOF(models, order_id, product_qty):
+def ModifOF(models, order_id, qty_producing):
     try:
         # Recherche de l'OF
         of_search_id = models.execute_kw(database, gUid, password,
@@ -272,7 +272,7 @@ def ModifOF(models, order_id, product_qty):
             # Mettre à jour la quantité de l'OF
             models.execute_kw(database, gUid, password,
                               'mrp.production', 'write',
-                              [[of_id_to_modify], {'product_qty': product_qty}])
+                              [[of_id_to_modify], {'qty_producing': qty_producing}])
             
             print(f"Quantité de l'OF avec l'ID {order_id} modifiée avec succès.")
             messagebox.showinfo("Succès", "L'OF: {} modifié avec succès".format(order_id))
