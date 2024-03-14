@@ -16,6 +16,8 @@
 
 import xmlrpc.client
 import design
+import tkinter as tk
+from tkinter import font
 
 
 EnterPassword = "Ntm123456789!"                                                                    #VARIABLE JARDEL POUR LE MOT DE PASSE
@@ -101,6 +103,8 @@ def AiguillageFields():
 
 
 if __name__ == "__main__":
+ 
+ 
  ConnectionCheck()
  getFields()
- #AiguillageFields()
+ AiguillageFields()

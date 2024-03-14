@@ -1,0 +1,1567 @@
+import PIL._tkinter_finder
+import tkinter as tk
+from tkinter import ttk, messagebox
+import xmlrpc.client
+import base64
+from PIL import Image as PILImage           ## JARDEL J'AI RENNOMER LA FONCTION IMAGE PIL C'EST OBLIGATOIR DONC FAIRE MODIFICATION
+from PIL import ImageTk
+import math
+from io import BytesIO
+from tkinter import *
+
+
+#from CodeStockageJardel import product
+#from CodeStockageJardel import search_product_in_stock_by_name
+
+
+
+#EnterPassword = Username #"Ntm123456789!"                                                         #VARIABLE JARDEL POUR LE MOT DE PASSE
+#EnterEmail = Password #"logistique"    "buisson.a@ad.afpi-bretagne.com"                           #VARIABLE JARDEL POUR MAIL OU IDENTIFIANT
+AuthentificationChek = False                                                                       #VARIABLE SI AUTHENTIFICATION CORRECTE
+ConnectionCheck = True                                                                             #VARIABLE SI CONNEXION est correcte
+ProfilType = None                                                                                  #VARIABLE TYPE DE PROFIL
+
+#Gestion des identifiants serveurs
+                                                                        #IP de connection du serveur Odoo
+server_port = 8069                                                                                 #Port de dconnection du serveur Odoo
+data_base = "PokeFigDataBase"                                                                      #Nom du conteneur dans Odoo
+#password = EnterPassword                                                                          #Gestion du mot de passe
+#Email = EnterEmail                                                                                #Gestion de l'identifiant
+
+uid = None
+Rectangle_restant = 0
+
+
+
+class SharedData:
+    def __init__(self):
+        self.valeur_ip = tk.StringVar() 
+        self.user = tk.StringVar()
+        self.pwd = tk.StringVar()
+        self.listing_acces = None  # Définir listing_acces en tant que variable globale
+        
+
+
+# Page de connexion
+class Pageconnect(tk.Frame):
+    def __init__(self, master, callback, shared_data):
+        super().__init__(master, background="#33c4ff")
+
+        self.master = master
+        self.callback = callback
+        self.shared_data = shared_data
+
+        #image_path = "CodePython/CodeInProgressFich/poke.png"
+        #self.image = tk.PhotoImage(file="/home/user/Clone/CodePython/CodeInProgressFich/poke.png")
+
+        # Créer un Label pour afficher l'image
+        #image_label = tk.Label(self, image=self.image, background="#33c4ff")
+        #image_label.grid(row=1, column=0, padx=10, pady=(20,1))
+
+        tk.Label(self, text="PokeFig", font=('Times New Roman', 32, 'bold'), foreground="#F1A226", background="#33c4ff").grid(row=2, column=0, padx=10, pady=(1,1))
+        tk.Label(self, text="Bienvenue sur la page de connexion", font=('Arial', 14), background="#33c4ff").grid(row=3, column=0, padx=10, pady=(0, 20))
+
+        global ip_frame
+        ip_frame = ttk.Frame(self)  # Créer un cadre pour l'adresse IP
+        
+
+        global content_frame
+        content_frame = ttk.Frame(self)
+
+        ttk.Label(content_frame, text="username:").grid(row=0, column=0, padx=10, pady=5)
+        ttk.Entry(content_frame, textvariable=self.shared_data.user).grid(row=0, column=1, padx=10, pady=5)
+
+        ttk.Label(content_frame, text="password:").grid(row=1, column=0, padx=10, pady=5)
+        ttk.Entry(content_frame, textvariable=self.shared_data.pwd, show="*").grid(row=1, column=1, padx=10, pady=5)
+
+        
+
+        ttk.Label(ip_frame, text="Adresse IP:").grid(row=0, column=0, padx=10, pady=1)
+        ttk.Entry(ip_frame, textvariable=self.shared_data.valeur_ip).grid(row=1, column=0, padx=10, pady=5)
+
+        
+        
+
+        # Bouton pour passer à la page suivante
+        global login
+        login = ttk.Button(content_frame, text="Login", command=self.afficher_boutons_pages)
+        login.grid(row=2, column=0, columnspan=2, pady=10)
+
+        ip_frame.grid(row=1, column=2)
+        content_frame.grid(row=1, column=1, padx=10, pady=5)
+
+
+    def afficher_boutons_pages(self):
+        global Username
+        global Password
+        global IP
+        global url
+
+        IP = self.shared_data.valeur_ip.get() 
+        url = f'http://{IP}:{server_port}'
+        Username = self.shared_data.user.get()
+        Password = self.shared_data.pwd.get()
+        
+
+
+        self.ConnectionCheck()
+        if AuthentificationChek == True :
+            self.getFields()
+
+    
+    def ConnectionCheck(self):                                                                          #Fonction block check Connection serveur Odoo
+        global AuthentificationChek
+        global uid
+
+        urlOdoo = f"http://{IP}:{server_port}/xmlrpc/2/common"                                  #Génération du lien pour la connection de Odoo
+        try:
+            common_proxy = xmlrpc.client.ServerProxy(urlOdoo)                                          #Connection au serveur avec le lien
+            uid = common_proxy.authenticate(data_base, Username, Password, {})                         #Connection au profile
+            
+            if uid is not False:
+                print(f"Connecté à Odoo version {common_proxy.version()}")                             #Retour d'information de la version d'odoo 
+                AuthentificationChek = True                                                            #Variable de confirmation de l'authentification
+                print(f"Identifiant de l'utilisateur (uid) : {uid}")                                   #Retour d'information du profile
+
+
+            else:
+                AuthentificationChek = False                                                           #Mise à faux de l'authentification
+                print(f"Erreur de connexion à Odoo {common_proxy.version()}")                             #Retour d'information du serveur
+        
+        except Exception as e:
+            print(f"Erreur de connexion à Odoo : {e}")                                                 #Retour du code erreur si pas de connexion avec le serveur
+            print("Échec Connexion")
+            ConnectionCheck = False
+            
+
+    def getFields(self):                                                                                   #Fonction block pour avoir les autorisations
+        global models
+        global ProfilType
+        global listing_acces
+        models = xmlrpc.client.ServerProxy('{}/xmlrpc/2/object'.format(url))                           #Connection au serveur
+        try:                                                                                            
+            acces = models.execute_kw(data_base, uid, Password, 'mrp.production', 'check_access_rights', ['write'])                                               
+            print(f"Manufactoring order write acces rights :{acces}")
+            if uid == 2 :
+                ProfilType = 'administrateur'
+                print(f"Profil administrateur")
+                login.destroy()
+                ttk.Button(content_frame, text="go prod", command=self.go_prod).grid(row=2, column=0, columnspan=1, pady=10)
+                ttk.Button(content_frame, text="go logic", command=self.go_logic).grid(row=2, column=1, columnspan=1, pady=10)
+                
+            else:
+                ProfilType = 'production'
+                print(f"Profil production")
+                self.callback(PageProduction, self.shared_data)
+
+        except:
+            print(f"Profil logistique")  
+            ProfilType = 'logistique'
+            self.callback(PageLogistique, self.shared_data)
+        
+    def go_prod(self):
+        self.callback(PageProduction, self.shared_data)
+
+    def go_logic(self):
+        self.callback(PageLogistique, self.shared_data)
+
+    def go_Admin(self):
+        self.callback(PageDetails, self.shared_data)
+
+class PageProduction(tk.Frame):
+
+    def __init__(self, master, callback, shared_data):
+        super().__init__(master)
+        self.master = master
+        self.callback = callback
+        self.shared_data = shared_data
+        self.prod_frames = []  # Liste pour stocker les cadres des produits
+        self.image_refs = []  # Liste pour stocker les références aux images
+
+
+        models_proxy = self.Connect(IP, server_port=8069, password="Ntm123456789!")
+
+         # Créer un canvas pour afficher la bannière
+        self.canvas = tk.Canvas(self, width=1920, height=100, bg="#33c4ff")
+        self.canvas.grid(row=0, column=0, columnspan=5)
+
+        # Dessiner un rectangle pour la bannière
+        self.canvas.create_rectangle(0, 0, 1920, 100, fill="#33c4ff")
+        
+
+
+        #tk.Label(header_frame, text="PokeFig", font=('Times New Roman', 32, 'bold'), foreground="#F1A226", background="#33c4ff").grid(row=0, column=0, padx=10, pady=0, sticky="w")
+        
+        if models_proxy:
+            # Appel de la fonction pour obtenir les informations des ordres de fabrication
+            order_info_text = self.getManufOrderToDo(models_proxy)
+
+            # Diviser les informations en blocs individuels
+            orders = order_info_text.split('----------------------------')
+
+            row_index = 1  # Commencer à partir de la deuxième ligne
+            col_index = 0  # Commencer à partir de la première colonne
+
+            # Par défaut, nous considérons que le premier bloc est vide
+            first_block_empty = True
+
+            # Créer un cadre pour chaque bloc d'informations et les afficher côte à côte
+            for i, order in enumerate(orders):
+                # Vérifier si c'est le premier bloc et s'il est vide
+                if i == 0 and not order.strip():
+                    continue  # Ne rien faire et passer au prochain bloc
+
+                # Si ce n'est pas le premier bloc ou s'il n'est pas vide, procéder à la création du cadre
+                # Créer un cadre pour afficher les informations de l'ordre
+                order_frame = tk.Frame(self, relief="solid", borderwidth=1)
+                order_frame.grid(row=row_index, column=col_index, padx=10, pady=10)
+
+                # Ajouter un libellé pour afficher les informations de l'ordre
+                order_label = tk.Label(order_frame, text=order, justify="left")
+                order_label.pack(padx=10, pady=10)
+
+                # Ajouter un bouton "Modifier" pour chaque cadre d'ordre de fabrication
+                modify_button = ttk.Button(order_frame, text="Modifier", command=lambda idx=i: self.modify_order(models_proxy, idx))
+                modify_button.pack(padx=10, pady=5)
+
+                # Incrémenter l'index de la colonne
+                col_index += 1
+
+                # Si nous avons atteint le cinquième bloc, passer à la ligne suivante
+                if col_index == 5:
+                    col_index = 0
+                    row_index += 1
+
+        # Bouton pour revenir à la page d'accueil
+        tk.Button(self, text="Déconnexion", command=self.deco).grid(pady=10)
+
+
+
+
+    def modify_order(self, models_proxy, order_index):
+        # Fonction appelée lors du clic sur le bouton "Modifier"
+        # Récupérer l'ID de l'OF à modifier
+        print(order_index)
+        order_id = self.get_order_id(models_proxy, order_index)
+        
+        # Créer une nouvelle fenêtre pour la saisie des nouvelles valeurs
+        modify_window = tk.Toplevel(self.master)
+        modify_window.title("Modifier l'OF")
+        
+        # Champ de saisie pour la nouvelle quantité
+        qty_label = ttk.Label(modify_window, text="Nouvelle quantité:")
+        qty_label.grid(row=0, column=0, padx=10, pady=5)
+        new_qty_entry = ttk.Entry(modify_window)
+        new_qty_entry.grid(row=0, column=1, padx=10, pady=5)
+
+         # Fonction pour mettre à jour l'OF et détruire la fenêtre de modification
+        def update_and_close():
+            self.update_order(models_proxy, order_id, new_qty_entry.get())
+            modify_window.destroy()
+        
+        # Bouton de confirmation pour mettre à jour l'OF
+        update_button = ttk.Button(modify_window, text="Mettre à jour", command=update_and_close)
+        update_button.grid(row=1, column=0, columnspan=2, padx=10, pady=5)
+           
+        
+    def get_order_id(self, models_proxy, order_index):
+        # Récupérer les informations des ordres de fabrication
+        order_info_text = self.getManufOrderToDo(models_proxy)
+
+        # Diviser les informations en blocs individuels
+        orders = order_info_text.split('----------------------------')
+
+        # Vérifier si l'index est valide
+        if 0 <= order_index < len(orders):
+            # Extraire l'ID de l'ordre à partir du bloc d'informations correspondant à l'index
+            order_lines = orders[order_index].strip().split('\n')
+            print(len(order_lines))
+            for line in order_lines:
+                print(line)
+                if line.startswith('- id'):
+                    order_id = int(line.split(':')[1].strip())
+                    
+                    return order_id
+
+        # Si l'index est invalide ou si aucun ID n'est trouvé, retourner None
+        print("not done")
+        return None
+
+    def update_order(self, models_proxy, order_id, new_qty):
+        # Fonction pour mettre à jour la quantité de l'OF
+        self.ModifOF(models_proxy, order_id, new_qty)
+        # Mettre à jour l'affichage des informations
+        # Implémentez cette partie en fonction de votre structure d'interface utilisateur
+    
+    def deco(self):
+        self.callback(Pageconnect, self.shared_data)
+    
+    def getManufOrderToDo(self, models):
+        #server_ip="172.31.11.60"
+        server_port=8069
+        password = "Ntm123456789!"
+        database = "PokeFigDataBase"
+
+        gUrl = f"http://{IP}:{server_port}/xmlrpc/2/common" 
+        common_proxy = xmlrpc.client.ServerProxy(gUrl)
+        gUid = common_proxy.authenticate("PokeFigDataBase", "buisson.a@ad.afpi-bretagne.com", password, {})
+
+        fields = ['name', 'date_planned_start', 'product_id', 'product_qty', 'qty_producing', 'state']
+        limit = 10
+        mo_list = models.execute_kw(database, gUid, password,
+            'mrp.production', 'search_read',
+            [[('state', 'in', ['confirmed', 'progress'])]],  # Recherche les états "en cours" ou "confirmé"
+            {'fields': fields, 'limit': limit}
+        )
+
+
+        if mo_list:
+            result_text = ""
+
+            for mo_dico in mo_list:
+                result_text += '----------------------------\n'
+                for k in mo_dico.keys():
+                    text = f' - {k} : {mo_dico[k]}\n'
+                    result_text += text
+            return result_text
+            print(result_text)
+        else:
+            return "Aucun ordre de fabrication trouvé ou une erreur est survenue."
+        
+    def ModifOF(self, models, order_id, qty_producing):
+        #server_ip="172.31.11.60"
+        server_port=8069
+        password = "Ntm123456789!"
+        database = "PokeFigDataBase"
+
+        gUrl = f"http://{IP}:{server_port}/xmlrpc/2/common" 
+        common_proxy = xmlrpc.client.ServerProxy(gUrl)
+        gUid = common_proxy.authenticate("PokeFigDataBase", "buisson.a@ad.afpi-bretagne.com", password, {}) #paimblancleo@gmail.com
+
+        try:
+            # Recherche de l'OF
+            of_search_id = models.execute_kw(database, gUid, password,
+                                            'mrp.production', 'search',
+                                            [[('id', '=', order_id)]])
+            
+            # Modification de la quantité de l'OF
+            if of_search_id:
+                # Extraire l'ID du premier élément de la liste
+                of_id_to_modify = of_search_id[0]
+                
+                # Mettre à jour la quantité de l'OF
+                models.execute_kw(database, gUid, password,
+                                'mrp.production', 'write',
+                                [[of_id_to_modify], {'qty_producing': qty_producing}])
+                
+                print(f"Quantité de l'OF avec l'ID {order_id} modifiée avec succès.")
+                messagebox.showinfo("Succès", "L'OF: {} modifié avec succès".format(order_id))
+            else:
+                print(f"Aucun OF trouvé avec l'ID {order_id}.")
+
+        except Exception as e:
+            print(f"Erreur lors de la modification de l'OF : {e}")
+        
+    def Connect(self, server_ip, server_port="8069", password="Ntm123456789!"):                                   #Définition de l'accès a la odoo
+        server_ip=IP
+        gUrl = f"http://{server_ip}:{server_port}/xmlrpc/2/common"                                                       #Construction de l'URL de connexion Odoo
+
+        try:
+            
+            common_proxy = xmlrpc.client.ServerProxy(gUrl)                                                               #Connexion au serveur Odoo en utilisant XML-RPC
+            gUid = common_proxy.authenticate("PokeFigDataBase", "paimblancleo@gmail.com", password, {})                  #Authentification
+
+            if gUid:
+                print(f"Connecté à Odoo version {common_proxy.version()} à l'adresse : {gUrl}")                          #Ecriture dans la console
+                print(f"Identifiant de l'utilisateur (uid) : {gUid}")                                                    #Ecriture dans la console
+
+                models = xmlrpc.client.ServerProxy(f"http://{server_ip}:{server_port}/xmlrpc/2/object")                  #Récupération des modèles Odoo
+                print("Connexion OK")                                                                                    #Ecriture dans la console si connexion reussie
+                return models
+            else:
+                print("Échec de l'authentification. Vérifiez les informations d'identification.")                        #Ecriture dans la console si echèc de l'authentification
+                return None
+
+        except Exception as e:
+            print(f"Erreur de connexion à Odoo : {e}")                                                                   #Ecriture dans la console si echèc de l'authentification
+            return None
+
+class PageLogistique(tk.Frame):
+    global stock_info_list
+    global ProfilType
+    
+    def __init__(self, master, callback, shared_data):
+        global ListingProduction
+        global stock_info_list
+        global NbrItem
+
+        super().__init__(master)
+        
+        self.pack()
+        self.master = master
+        self.callback = callback
+        self.shared_data = shared_data
+        self.canvas = tk.Canvas(self, width=1920, height=1080)
+        self.canvas.pack()
+        ListingProduction = self.product()                                                              #Listing Product
+        stock_info_list = []                                                                            #Création du listing pour jardel
+
+        if ListingProduction:                                                                           #Si la liste de production n'est pas vide
+            for ListingProduction in ListingProduction:                                                 # Boucle pour écriture la liste dans la console
+                product_name_to_search = ListingProduction.get('name')
+                self.search_product_in_stock_by_name(product_name_to_search)
+        NbrItem = len(stock_info_list)
+        self.Bannières()
+        self.draw_squares()
+        self.top_of_page()
+        self.footer_page()
+
+    def deco(self, event):
+        global Groupe_Selection
+        global Ordre_Name
+
+        Groupe_Selection = None
+        Ordre_Name = None
+
+        self.callback(Pageconnect, self.shared_data)
+
+    def go_prod(self):
+        self.callback(PageProduction, self.shared_data)
+    
+    def draw_squares(self,**FiltreRechercheOn):
+        global Rectangle_restant
+        global PageActuel
+        global CompRectangle
+        global filtered_list
+        global ModeRecherche
+        global NbrItemFiltre
+
+        Rectangle_restant = 0
+        
+        PageActuel = 1
+        photo_references = []
+        
+        Largeur_Rectangle = 400
+        Hauteur_Rectangle = 300
+        spacing = 60
+        JumpY = 1
+        jumpX = 0
+
+        if FiltreRechercheOn :               #MODE RECHERCHE
+            ModeRecherche = True
+            NbrItemFiltre = len(filtered_list)
+            print(NbrItemFiltre)
+            for i in range(NbrItemFiltre):
+                if JumpY <= 4 : 
+                    x = i * (Largeur_Rectangle + spacing) + 70
+                    y = 220
+                    CordY = y
+
+                if JumpY >= 5 and JumpY <= 8:
+                    x = jumpX * (Largeur_Rectangle + spacing) + 70
+                    y = Hauteur_Rectangle + CordY + spacing
+                    jumpX = jumpX + 1
+            
+                if JumpY >= 9 :
+                    Rectangle_restant = JumpY - 8
+                    #print(Rectangle_restant)
+            
+                if JumpY <= 8 :
+                
+                    self.draw_rounded_rectangle(x, y, Largeur_Rectangle, Hauteur_Rectangle, corner_radius=20, color="black")
+            
+                    TextName = f'{filtered_list[0 + (JumpY -1)]["name"]}'
+                    TextQuantity = f'Quantity : {filtered_list[0 + (JumpY -1)]["quantity"]} Unit'
+                    TextStockId = f'Internal_ID : {filtered_list[0 + (JumpY -1)]["Stockage_id"]}'
+                    TextPrice = f'Price : {filtered_list[0 + (JumpY -1)]["Prix"]} €'
+                
+                    Postion_text = 100
+                    y_text = (y - 82) + Hauteur_Rectangle / 2
+
+                    #############################################################################################
+                    text_name_obj = self.canvas.create_text((x + Postion_text) + Largeur_Rectangle / 2, (y - 110) + Hauteur_Rectangle / 2 , text=TextName, font=('Helvetica', 16), fill='black')
+                    bbox_coordsName = self.canvas.bbox(text_name_obj)
+                    paddingName = 10
+                    x1, y1, x2, y2 = bbox_coordsName
+                    x1 -= paddingName
+                    y1 -= paddingName
+                    x2 += paddingName
+                    y2 += paddingName
+                    self.canvas.create_rectangle(x1, y1, x2, y2, outline="black", width=2,fill="gray70")
+                    self.canvas.create_text((x + Postion_text) + Largeur_Rectangle / 2, (y - 110) + Hauteur_Rectangle / 2 , text=TextName, font=('Helvetica', 16, 'bold'), fill='black')
+                
+                    #############################################################################################
+                    y_text += 60
+                    #############################################################################################
+                    text_quantity_obj = self.canvas.create_text((x + Postion_text) + Largeur_Rectangle / 2, y_text, text=TextQuantity, font=('Helvetica', 12), fill='black')
+                    bbox_coordsQuantity = self.canvas.bbox(text_quantity_obj)
+                    paddingQuantity = 10
+                    x1, y1, x2, y2 = bbox_coordsQuantity
+                    x1 -= paddingQuantity
+                    y1 -= paddingQuantity
+                    x2 += paddingQuantity
+                    y2 += paddingQuantity
+                    self.canvas.create_rectangle(x1, y1, x2, y2, outline="black", width=2)
+                    #############################################################################################
+                    y_text += 60
+                    #############################################################################################
+                    text_stockid_obj = self.canvas.create_text((x + Postion_text) + Largeur_Rectangle / 2, y_text, text=TextStockId, font=('Helvetica', 12), fill='black', tags= str(stock_info_list[0 + (JumpY -1)]["Stockage_id"]))
+                    bbox_coordsStockId = self.canvas.bbox(text_stockid_obj)
+                    paddingStockId = 10
+                    x1, y1, x2, y2 = bbox_coordsStockId
+                    x1 -= paddingStockId
+                    y1 -= paddingStockId
+                    x2 += paddingStockId
+                    y2 += paddingStockId
+                    self.canvas.create_rectangle(x1, y1, x2, y2, outline="black", width=2)
+                    #############################################################################################
+                    y_text += 60
+                    #############################################################################################
+                    text_price_obj = self.canvas.create_text((x + Postion_text) + Largeur_Rectangle / 2, y_text, text=TextPrice, font=('Helvetica', 12), fill='black')
+                    bbox_coordsPrice = self.canvas.bbox(text_price_obj)
+                    paddingPrice = 10
+                    x1, y1, x2, y2 = bbox_coordsPrice
+                    x1 -= paddingPrice
+                    y1 -= paddingPrice
+                    x2 += paddingPrice
+                    y2 += paddingPrice
+                    self.canvas.create_rectangle(x1, y1, x2, y2, outline="black", width=2)
+                    #############################################################################################
+
+                    image_binary = filtered_list[0 + (JumpY - 1)]['Image']
+                    img = PILImage.open(BytesIO(base64.b64decode(image_binary)))
+                    img = img.resize((200, 280))
+
+                    photo = ImageTk.PhotoImage(img)
+                    photo_references.append(photo)
+                    img_x = (x - 92) + Largeur_Rectangle / 2
+                    img_y = y_text - 240
+
+                    self.canvas.create_image(img_x , img_y, anchor=tk.N, image=photo)
+                    self.photo_references = photo_references
+                    self.canvas.tag_bind(text_quantity_obj, '<Button-1>', self.on_text_stock_id_click)
+                JumpY = JumpY + 1
+        else :                          #Mode Défaut 
+            ModeRecherche = False
+            for i in range(NbrItem):
+                if JumpY <= 4 : 
+                    x = i * (Largeur_Rectangle + spacing) + 70
+                    y = 220
+                    CordY = y
+
+                if JumpY >= 5 and JumpY <= 8:
+                    x = jumpX * (Largeur_Rectangle + spacing) + 70
+                    y = Hauteur_Rectangle + CordY + spacing
+                    jumpX = jumpX + 1
+            
+                if JumpY >= 9 :
+                    Rectangle_restant = JumpY - 8
+                    #print(Rectangle_restant)
+            
+                if JumpY <= 8 :
+                
+                    self.draw_rounded_rectangle(x, y, Largeur_Rectangle, Hauteur_Rectangle, corner_radius=20, color="black")
+            
+                    TextName = f'{stock_info_list[0 + (JumpY -1)]["name"]}'
+                    TextQuantity = f'Quantity : {stock_info_list[0 + (JumpY -1)]["quantity"]} Unit'
+                    TextStockId = f'Internal_ID : {stock_info_list[0 + (JumpY -1)]["Stockage_id"]}'
+                    TextPrice = f'Price : {stock_info_list[0 + (JumpY -1)]["Prix"]} €'
+                
+                    Postion_text = 100
+                    y_text = (y - 82) + Hauteur_Rectangle / 2
+
+                    #############################################################################################
+                    text_name_obj = self.canvas.create_text((x + Postion_text) + Largeur_Rectangle / 2, (y - 110) + Hauteur_Rectangle / 2 , text=TextName, font=('Helvetica', 16), fill='black')
+                    bbox_coordsName = self.canvas.bbox(text_name_obj)
+                    paddingName = 10
+                    x1, y1, x2, y2 = bbox_coordsName
+                    x1 -= paddingName
+                    y1 -= paddingName
+                    x2 += paddingName
+                    y2 += paddingName
+                    self.canvas.create_rectangle(x1, y1, x2, y2, outline="black", width=2,fill="gray70")
+                    self.canvas.create_text((x + Postion_text) + Largeur_Rectangle / 2, (y - 110) + Hauteur_Rectangle / 2 , text=TextName, font=('Helvetica', 16, 'bold'), fill='black')
+                
+                    #############################################################################################
+                    y_text += 60
+                    #############################################################################################
+                    text_quantity_obj = self.canvas.create_text((x + Postion_text) + Largeur_Rectangle / 2, y_text, text=TextQuantity, font=('Helvetica', 12), fill='black', tags= str(stock_info_list[0 + (JumpY -1)]["Stockage_id"]))
+                    bbox_coordsQuantity = self.canvas.bbox(text_quantity_obj)
+                    paddingQuantity = 10
+                    x1, y1, x2, y2 = bbox_coordsQuantity
+                    x1 -= paddingQuantity
+                    y1 -= paddingQuantity
+                    x2 += paddingQuantity
+                    y2 += paddingQuantity
+                    self.canvas.create_rectangle(x1, y1, x2, y2, outline="black", width=2)
+                    #############################################################################################
+                    y_text += 60
+                    #############################################################################################
+                    text_stockid_obj = self.canvas.create_text((x + Postion_text) + Largeur_Rectangle / 2, y_text, text=TextStockId, font=('Helvetica', 12), fill='black')
+                    bbox_coordsStockId = self.canvas.bbox(text_stockid_obj)
+                    paddingStockId = 10
+                    x1, y1, x2, y2 = bbox_coordsStockId
+                    x1 -= paddingStockId
+                    y1 -= paddingStockId
+                    x2 += paddingStockId
+                    y2 += paddingStockId
+                    self.canvas.create_rectangle(x1, y1, x2, y2, outline="black", width=2)
+                    #############################################################################################
+                    y_text += 60
+                    #############################################################################################
+                    text_price_obj = self.canvas.create_text((x + Postion_text) + Largeur_Rectangle / 2, y_text, text=TextPrice, font=('Helvetica', 12), fill='black')
+                    bbox_coordsPrice = self.canvas.bbox(text_price_obj)
+                    paddingPrice = 10
+                    x1, y1, x2, y2 = bbox_coordsPrice
+                    x1 -= paddingPrice
+                    y1 -= paddingPrice
+                    x2 += paddingPrice
+                    y2 += paddingPrice
+                    self.canvas.create_rectangle(x1, y1, x2, y2, outline="black", width=2)
+                    #############################################################################################
+
+                    image_binary = stock_info_list[0 + (JumpY - 1)]['Image']
+                    img = PILImage.open(BytesIO(base64.b64decode(image_binary)))
+                    img = img.resize((200, 280))
+
+                    photo = ImageTk.PhotoImage(img)
+                    photo_references.append(photo)
+                    img_x = (x - 92) + Largeur_Rectangle / 2
+                    img_y = y_text - 240
+
+                    self.canvas.create_image(img_x , img_y, anchor=tk.N, image=photo)
+                    self.photo_references = photo_references
+                    
+                    self.canvas.tag_bind(text_quantity_obj, '<Button-1>', self.on_text_stock_id_click)
+                JumpY = JumpY + 1
+        CompRectangle = Rectangle_restant
+    
+    def on_text_stock_id_click(self, event):
+        global tagsItems
+    # Obtenez l'identifiant de l'élément sur lequel le clic a été effectué
+        item_id = event.widget.find_withtag('current')
+        tagsItems = event.widget.gettags(item_id)
+    # Votre code pour traiter le clic, par exemple :
+        bbox_coords = self.canvas.bbox(item_id)
+    # Calculer les coordonnées pour placer self.ValeurModification
+        x_placement = bbox_coords[2]- 68 # Juste à droite de l'élément
+        y_placement = (bbox_coords[1] + bbox_coords[3]) / 2 - 16  # Centre vertical de l'élément
+
+    # Placez self.ValeurModification à ces coordonnées
+        self.ValeurModification = Entry(font=("Machine", 15), fg="black", bd=0, border=1)
+        self.ValeurModification.place(x=x_placement, y=y_placement, height=30, width=35)
+        self.ValeurModification.bind("<Return>", self.WriteStockage)
+
+    def WriteStockage(self,event):                                                        #Fonction pour écriture de la base de données
+        global tagsItems
+        product_id = int(tagsItems[0])
+        new_quantity = self.ValeurModification.get() 
+        print(product_id)
+        print(new_quantity)
+        self.ValeurModification.destroy()
+        #self.canvas.delete(self.ValeurModification)
+        try:
+        # Recherche du stock du produit
+            stock_Modification_id = models.execute_kw(data_base, uid, Password,
+                                     'stock.quant', 'search',
+                                     [[('product_id', '=', product_id)]])
+        
+        # Modification du stock
+            if stock_Modification_id:
+            # Extraire l'ID du premier élément de la liste
+                stock_id_to_modify = stock_Modification_id[0]
+                models.execute_kw(data_base, uid, Password,
+                              'stock.quant', 'write',
+                              [[stock_id_to_modify], {'quantity': new_quantity}])
+                print(f"Stock du produit avec l'ID {product_id} modifié avec succès.")
+                self.actualiser_action()
+            else:
+                print(f"Aucun stock trouvé pour le produit avec l'ID {product_id}.")
+
+        except Exception as e:
+            print(f"Erreur lors de la modification du stock : {e}")   
+        self.actualiser_action(event)
+    def PagePrecedente(self):
+        global Rectangle_restant
+        global NbrItem
+        global PageActuel
+        global ModeRecherche
+        global NbrItemFiltre
+        try:
+            if Rectangle_restant + 8 == NbrItemFiltre and ModeRecherche == True :
+                self.canvas.delete("all")
+                Rectangle_restant = Rectangle_restant + 8
+                PageActuel = PageActuel - 1
+                self.draw_squares(FiltreRechercheOn = True)
+                self.Bannières()
+                self.top_of_page()
+                self.footer_page()
+        except Exception as e:
+            if Rectangle_restant + 8 == NbrItem and ModeRecherche == False :
+                self.canvas.delete("all")
+                Rectangle_restant = Rectangle_restant + 8
+                PageActuel = PageActuel - 1
+                self.draw_squares()
+                self.Bannières()
+                self.top_of_page()
+                self.footer_page()
+
+        if Rectangle_restant + 8 != NbrItem and Rectangle_restant != NbrItem and NbrItem >= 8 and ModeRecherche == False :
+            print("test3")
+            PageActuel = PageActuel - 1
+            self.canvas.delete("all")
+            self.Bannières()
+            self.top_of_page()
+            self.footer_page()
+            Largeur_Rectangle = 400
+            Hauteur_Rectangle = 300
+            spacing = 60
+            JumpY = 1
+            jumpX = 0
+
+            for i in range(Rectangle_restant): 
+                if JumpY <= 4 : 
+                    x = i * (Largeur_Rectangle + spacing) + 70
+                    y = 140
+                    CordY = y
+
+                if JumpY >= 5 and JumpY <= 8:
+                    x = jumpX * (Largeur_Rectangle + spacing) + 70
+                    y = Hauteur_Rectangle + CordY + spacing
+                    jumpX = jumpX + 1
+
+                if JumpY >= 9 :     
+                    pass
+
+                if JumpY <= 8 :
+                    self.canvas.create_rectangle(x, y, x + Largeur_Rectangle, y + Hauteur_Rectangle, outline="black", width=4)
+
+                    texte = f'Carré {JumpY}'  
+                    self.canvas.create_text(x + Largeur_Rectangle / 2, y + Hauteur_Rectangle / 2, text=texte, font=('Helvetica', 12), fill='black')
+                    JumpY = JumpY + 1
+
+            Rectangle_restant=  Rectangle_restant + 8
+   
+    def PageSuivante(self):
+        global Rectangle_restant      
+        global NbrItem
+        global PageActuel
+        global CompRectangle
+        global ModeRecherche
+        global filtered_list
+        global NbrItemFiltre
+
+        photo_references = []
+
+        Largeur_Rectangle = 400
+        Hauteur_Rectangle = 300
+        spacing = 60
+        JumpY = 1
+        jumpX = 0 
+
+        if ModeRecherche == True :                              # Mode recherche
+            
+            if NbrItemFiltre >= 9 and not CompRectangle <= 0:
+                PageActuel = PageActuel + 1
+                self.canvas.delete("all")           
+                self.Bannières()
+                self.top_of_page()
+                self.footer_page()
+
+                for i in range(Rectangle_restant):
+                    if JumpY <= 4 : 
+                        x = i * (Largeur_Rectangle + spacing) + 70
+                        y = 220
+                        CordY = y
+
+                    if JumpY >= 5 and JumpY <= 8:
+                        x = jumpX * (Largeur_Rectangle + spacing) + 70
+                        y = y = Hauteur_Rectangle + CordY + spacing
+                        jumpX = jumpX + 1
+            
+                    if JumpY >= 9 :     
+                        Rectangle_restant = JumpY - 8
+                        #print(Rectangle_restant)
+
+                    if JumpY <= 8 :
+
+                        self.draw_rounded_rectangle(x, y, Largeur_Rectangle, Hauteur_Rectangle, corner_radius=20, color="black")
+                        TextName = f'{filtered_list[0 + (NbrItemFiltre - Rectangle_restant)+ (JumpY -1)]["name"]}'
+                        TextQuantity = f'Quantity : {filtered_list[0 + (NbrItemFiltre - Rectangle_restant) + (JumpY -1)]["quantity"]} Unit'
+                        TextStockId = f'Internal_ID : {filtered_list[0 + (NbrItemFiltre - Rectangle_restant) + (JumpY -1)]["Stockage_id"]}'
+                        TextPrice = f'Price : {filtered_list[0 + (NbrItemFiltre - Rectangle_restant) + (JumpY -1)]["Prix"]} €'
+                
+                        Postion_text = 100
+                        y_text = (y - 82) + Hauteur_Rectangle / 2
+
+                        #############################################################################################
+                        text_name_obj = self.canvas.create_text((x + Postion_text) + Largeur_Rectangle / 2, (y - 110) + Hauteur_Rectangle / 2 , text=TextName, font=('Helvetica', 16), fill='black')
+                        bbox_coordsName = self.canvas.bbox(text_name_obj)
+                        paddingName = 10
+                        x1, y1, x2, y2 = bbox_coordsName
+                        x1 -= paddingName
+                        y1 -= paddingName
+                        x2 += paddingName
+                        y2 += paddingName
+                        self.canvas.create_rectangle(x1, y1, x2, y2, outline="black", width=2,fill="gray70")
+                        self.canvas.create_text((x + Postion_text) + Largeur_Rectangle / 2, (y - 110) + Hauteur_Rectangle / 2 , text=TextName, font=('Helvetica', 16, 'bold'), fill='black')
+                
+                        #############################################################################################
+                        y_text += 60
+                        #############################################################################################
+                        text_quantity_obj = self.canvas.create_text((x + Postion_text) + Largeur_Rectangle / 2, y_text, text=TextQuantity, font=('Helvetica', 12), fill='black', tags= str(filtered_list[0 + (NbrItemFiltre - Rectangle_restant) + (JumpY -1)]["Stockage_id"]))
+                        bbox_coordsQuantity = self.canvas.bbox(text_quantity_obj)
+                        paddingQuantity = 10
+                        x1, y1, x2, y2 = bbox_coordsQuantity
+                        x1 -= paddingQuantity
+                        y1 -= paddingQuantity
+                        x2 += paddingQuantity
+                        y2 += paddingQuantity
+                        self.canvas.create_rectangle(x1, y1, x2, y2, outline="black", width=2)
+                        #############################################################################################
+                        y_text += 60
+                        #############################################################################################
+                        text_stockid_obj = self.canvas.create_text((x + Postion_text) + Largeur_Rectangle / 2, y_text, text=TextStockId, font=('Helvetica', 12), fill='black')
+                        bbox_coordsStockId = self.canvas.bbox(text_stockid_obj)
+                        paddingStockId = 10
+                        x1, y1, x2, y2 = bbox_coordsStockId
+                        x1 -= paddingStockId
+                        y1 -= paddingStockId
+                        x2 += paddingStockId
+                        y2 += paddingStockId
+                        self.canvas.create_rectangle(x1, y1, x2, y2, outline="black", width=2)
+                        #############################################################################################
+                        y_text += 60
+                        #############################################################################################
+                        text_price_obj = self.canvas.create_text((x + Postion_text) + Largeur_Rectangle / 2, y_text, text=TextPrice, font=('Helvetica', 12), fill='black')
+                        bbox_coordsPrice = self.canvas.bbox(text_price_obj)
+                        paddingPrice = 10
+                        x1, y1, x2, y2 = bbox_coordsPrice
+                        x1 -= paddingPrice
+                        y1 -= paddingPrice
+                        x2 += paddingPrice
+                        y2 += paddingPrice
+                        self.canvas.create_rectangle(x1, y1, x2, y2, outline="black", width=2)
+                        #############################################################################################
+            
+                        image_binary = filtered_list[0 + (NbrItemFiltre - Rectangle_restant) + (JumpY - 1)]['Image']
+                        img = PILImage.open(BytesIO(base64.b64decode(image_binary)))
+                        img = img.resize((200, 280))
+
+                    
+                        photo = ImageTk.PhotoImage(img)
+                        photo_references.append(photo)
+                        img_x = (x - 92) + Largeur_Rectangle / 2
+                        img_y = y_text - 240
+
+                        self.canvas.create_image(img_x , img_y, anchor=tk.N, image=photo, )
+                        self.photo_references = photo_references
+                    CompRectangle = CompRectangle - 1
+                    print(CompRectangle)
+                    self.canvas.tag_bind(text_quantity_obj, '<Button-1>', self.on_text_stock_id_click)   
+                    JumpY = JumpY + 1
+            ##########################################################################################################################
+            
+        else :                                                              # Mode défaut
+                
+            if NbrItem >= 9 and not CompRectangle <= 0:
+                PageActuel = PageActuel + 1
+                self.canvas.delete("all")           
+                self.Bannières()
+                self.top_of_page()
+                self.footer_page()
+                
+                for i in range(Rectangle_restant):
+                    if JumpY <= 4 : 
+                        x = i * (Largeur_Rectangle + spacing) + 70
+                        y = 220
+                        CordY = y
+
+                    if JumpY >= 5 and JumpY <= 8:
+                        x = jumpX * (Largeur_Rectangle + spacing) + 70
+                        y = y = Hauteur_Rectangle + CordY + spacing
+                        jumpX = jumpX + 1
+            
+                    if JumpY >= 9 :     
+                        Rectangle_restant = JumpY - 8
+                        #print(Rectangle_restant)
+
+                    if JumpY <= 8 :
+
+                        self.draw_rounded_rectangle(x, y, Largeur_Rectangle, Hauteur_Rectangle, corner_radius=20, color="black")
+                        TextName = f'{stock_info_list[0 + (NbrItem - Rectangle_restant)+ (JumpY -1)]["name"]}'
+                        TextQuantity = f'Quantity : {stock_info_list[0 + (NbrItem - Rectangle_restant) + (JumpY -1)]["quantity"]} Unit'
+                        TextStockId = f'Internal_ID : {stock_info_list[0 + (NbrItem - Rectangle_restant) + (JumpY -1)]["Stockage_id"]}'
+                        TextPrice = f'Price : {stock_info_list[0 + (NbrItem - Rectangle_restant) + (JumpY -1)]["Prix"]} €'
+                
+                        Postion_text = 100
+                        y_text = (y - 82) + Hauteur_Rectangle / 2
+
+                        #############################################################################################
+                        text_name_obj = self.canvas.create_text((x + Postion_text) + Largeur_Rectangle / 2, (y - 110) + Hauteur_Rectangle / 2 , text=TextName, font=('Helvetica', 16), fill='black')
+                        bbox_coordsName = self.canvas.bbox(text_name_obj)
+                        paddingName = 10
+                        x1, y1, x2, y2 = bbox_coordsName
+                        x1 -= paddingName
+                        y1 -= paddingName
+                        x2 += paddingName
+                        y2 += paddingName
+                        self.canvas.create_rectangle(x1, y1, x2, y2, outline="black", width=2,fill="gray70")
+                        self.canvas.create_text((x + Postion_text) + Largeur_Rectangle / 2, (y - 110) + Hauteur_Rectangle / 2 , text=TextName, font=('Helvetica', 16, 'bold'), fill='black')
+                
+                        #############################################################################################
+                        y_text += 60
+                        #############################################################################################
+                        text_quantity_obj = self.canvas.create_text((x + Postion_text) + Largeur_Rectangle / 2, y_text, text=TextQuantity, font=('Helvetica', 12), fill='black', tags= str(stock_info_list[0 + (NbrItem - Rectangle_restant) + (JumpY -1)]["Stockage_id"]))
+                        bbox_coordsQuantity = self.canvas.bbox(text_quantity_obj)
+                        paddingQuantity = 10
+                        x1, y1, x2, y2 = bbox_coordsQuantity
+                        x1 -= paddingQuantity
+                        y1 -= paddingQuantity
+                        x2 += paddingQuantity
+                        y2 += paddingQuantity
+                        self.canvas.create_rectangle(x1, y1, x2, y2, outline="black", width=2)
+                        #############################################################################################
+                        y_text += 60
+                        #############################################################################################
+                        text_stockid_obj = self.canvas.create_text((x + Postion_text) + Largeur_Rectangle / 2, y_text, text=TextStockId, font=('Helvetica', 12), fill='black')
+                        bbox_coordsStockId = self.canvas.bbox(text_stockid_obj)
+                        paddingStockId = 10
+                        x1, y1, x2, y2 = bbox_coordsStockId
+                        x1 -= paddingStockId
+                        y1 -= paddingStockId
+                        x2 += paddingStockId
+                        y2 += paddingStockId
+                        self.canvas.create_rectangle(x1, y1, x2, y2, outline="black", width=2)
+                        #############################################################################################
+                        y_text += 60
+                        #############################################################################################
+                        text_price_obj = self.canvas.create_text((x + Postion_text) + Largeur_Rectangle / 2, y_text, text=TextPrice, font=('Helvetica', 12), fill='black')
+                        bbox_coordsPrice = self.canvas.bbox(text_price_obj)
+                        paddingPrice = 10
+                        x1, y1, x2, y2 = bbox_coordsPrice
+                        x1 -= paddingPrice
+                        y1 -= paddingPrice
+                        x2 += paddingPrice
+                        y2 += paddingPrice
+                        self.canvas.create_rectangle(x1, y1, x2, y2, outline="black", width=2)
+                        #############################################################################################
+            
+                        image_binary = stock_info_list[0 + (NbrItem - Rectangle_restant) + (JumpY - 1)]['Image']
+                        img = PILImage.open(BytesIO(base64.b64decode(image_binary)))
+                        img = img.resize((200, 280))
+
+                    
+                        photo = ImageTk.PhotoImage(img)
+                        photo_references.append(photo)
+                        img_x = (x - 92) + Largeur_Rectangle / 2
+                        img_y = y_text - 240
+
+                        self.canvas.create_image(img_x , img_y, anchor=tk.N, image=photo, )
+                        self.photo_references = photo_references
+                    CompRectangle = CompRectangle - 1
+                    print(CompRectangle)
+                    self.canvas.tag_bind(text_quantity_obj, '<Button-1>', self.on_text_stock_id_click)  
+                    JumpY = JumpY + 1
+
+
+    def product(self):                                                                                     #Block de recherche production
+        global stock_info_list
+
+        try:
+            product_ids = models.execute_kw( data_base, uid, Password,
+                                        'product.template', 'search_read',
+                                        [[]],
+                                        {'fields': ['id', 'name', 'list_price','image_1920']})
+            return product_ids if product_ids else None
+   
+        except Exception as e:
+            print(f"Erreur lors de la recherche des produits : {e}")
+        return None
+    
+    def search_product_in_stock_by_name(self, product_name):                                               #Block de recherche dans stockage + listing all
+        try:
+        # Recherche des articles dans le stock dans la base de données
+            stock_ids = models.execute_kw(data_base, uid, Password,
+                                      'stock.quant', 'search',
+                                      [[('product_id.name', 'ilike', product_name)]])
+        
+            if stock_ids:
+                for stock_id in stock_ids:
+                # Récupération des informations sur l'article dans le stock
+                    stock_info = models.execute_kw(data_base, uid, Password,
+                                               'stock.quant', 'read',
+                                               [stock_id],
+                                               {'fields': ['id', 'product_id', 'quantity']})
+                    if stock_info[0]['quantity'] >= 0 :                 
+                        stock_info_dict = {
+                                        'id': stock_info[0]['id'],
+                                        'Stockage_id': stock_info[0]['product_id'][0],
+                                        'name': stock_info[0]['product_id'][1],
+                                        'quantity': stock_info[0]['quantity'], 
+                                        'Product_id': ListingProduction.get('id'),
+                                        'Prix': ListingProduction.get('list_price'),
+                                        'Image' : ListingProduction.get('image_1920')
+                                        }
+                        stock_info_list.append(stock_info_dict)
+                        #print(stock_info_dict)
+            else:
+                print(f"Pas de produit en stock : '{product_name}'.")
+
+        except Exception as e:
+            print(f"Erreur lors de la recherche d'articles dans le stock : {e}")
+
+    def Bannières(self):
+        global ProfilType
+        global MenuOpen
+        global MenuEnter
+
+        profil_picture_references = []
+        banner_width = 1920
+        banner_height = 90
+        MenuOpen = False
+        MenuEnter = False
+        
+        self.canvas.create_rectangle(0, 0, banner_width, banner_height, fill="#33c4ff")
+
+
+        try :
+            user_data= models.execute_kw(data_base, uid, Password,
+                                        'res.users',
+                                        'read',
+                                        [[uid],
+                                         ['name',
+                                          'image_1920','id']])
+            
+            
+            profil_data = user_data[0] ['image_1920']
+            profil_picture = PILImage.open(BytesIO(base64.b64decode(profil_data)))
+            profil_picture = profil_picture.resize((80, 80))
+
+            ProfilPict = ImageTk.PhotoImage(profil_picture)
+            profil_picture_references.append(ProfilPict)
+            self.canvas.create_image( 50, 5, anchor=tk.N, image = ProfilPict)
+            self.profil_picture_references = profil_picture_references
+            self.canvas.create_rectangle(10, 85, 90 , 5, outline="black", width=2)
+            self.canvas.create_rectangle(1852, 25, 1900 , 30, outline="black", width=2, fill="Black")               #Logo Menu 1er étage
+            self.canvas.create_rectangle(1852, 40, 1900 , 45, outline="black", width=2, fill="Black")               #Logo Menu 2eme étage
+            self.canvas.create_rectangle(1852, 55, 1900 , 60, outline="black", width=2, fill="Black")               #Logo Menu 3eme étage
+            Open_menu = self.canvas.create_rectangle(1852, 25, 1900 , 60, outline="black", width=0)                 # Carré ouverture du menu
+            text_offset_x = 100
+
+
+            ######################################################################################################  Création des instructions indentifiants 
+            self.canvas.create_text(25 + text_offset_x, 25, text='Name:', font=('Helvetica', 12), fill='black')
+            self.canvas.create_text(38 + text_offset_x, 45, text='InternalID:', font=('Helvetica', 12), fill='black')
+            self.canvas.create_text(25 + text_offset_x, 65, text= 'Poste:' , font=('Helvetica', 12), fill='black')
+            self.canvas.create_text(110 + text_offset_x, 25, text=user_data[0]['name'], font=('Helvetica', 12), fill='black')
+            self.canvas.create_text(90 + text_offset_x, 45, text=user_data[0]["id"], font=('Helvetica', 12), fill='black')
+            self.canvas.create_text(100 + text_offset_x, 65, text= ProfilType , font=('Helvetica', 12), fill='black')
+            ######################################################################################################  
+
+
+            ######################################################################################################  Création barre principal
+            self.draw_rounded_rectangle(100, 87, 1730 , 7, 7, color="black")
+            self.draw_rounded_rectangle(103, 90, 1723 , 4, 4, color="black")
+            ######################################################################################################                  
+            
+            home = self.canvas.create_text(1920 / 2, 42, text="PokéFig Logistique", font=("Machine", 30, 'bold'), fill="Black")
+            self.canvas.tag_bind(home, '<Button-1>', self.actualiser_action)
+            self.canvas.tag_bind(Open_menu, '<Enter>', self.open_menu_hovered)
+            self.canvas.tag_bind(Open_menu, '<Leave>', self.open_menu_left) 
+            
+            if MenuOpen == False :
+                self.canvas.tag_bind(Open_menu, '<Button-1>', self.open_menu_enter)
+            if MenuOpen == True :
+                self.canvas.tag_bind(Open_menu, '<Button-1>', self.open_menu_left)
+                
+
+        except Exception as e:
+            print(f"Erreur lors de la recherche de l'image : {e}")
+        return None
+
+    def draw_rounded_rectangle(self, x, y, width, height, corner_radius, color, **kwargs):
+        # Créer un rectangle avec des bords arrondis
+        self.canvas.create_arc(x, y, x + 2 * corner_radius, y + 2 * corner_radius,
+                               start=90, extent=90, style=tk.ARC, outline= color, width=4, **kwargs)
+        self.canvas.create_arc(x + width - 2 * corner_radius, y, x + width, y + 2 * corner_radius,
+                               start=0, extent=90, style=tk.ARC, outline= color, width=4, **kwargs)
+        self.canvas.create_arc(x, y + height - 2 * corner_radius, x + 2 * corner_radius, y + height,
+                               start=180, extent=90, style=tk.ARC, outline=color, width=4, **kwargs)
+        self.canvas.create_arc(x + width - 2 * corner_radius, y + height - 2 * corner_radius,
+                               x + width, y + height, start=270, extent=90, style=tk.ARC, outline= color, width=4, **kwargs)
+        self.canvas.create_line(x + corner_radius, y, x + width - corner_radius, y, fill= color, width=4, **kwargs)
+        self.canvas.create_line(x, y + corner_radius, x, y + height - corner_radius, fill= color, width=4, **kwargs)
+        self.canvas.create_line(x + width, y + corner_radius, x + width, y + height - corner_radius, fill= color, width=4, **kwargs)
+        self.canvas.create_line(x + corner_radius, y + height, x + width - corner_radius, y + height, fill= color, width=4, **kwargs)
+    
+    def top_of_page(self):
+        ################################################################################################################ Filtre
+        global Groupe_Selection
+        global Ordre_Selection
+        global Groupe_text
+        global Ordre_text
+        global Ordre_Name
+        global Groupe_Name
+        global NbrItem
+        global PageActuel
+        global NbrPage
+        global text_PageActuel
+        global NbrItemFiltre
+        global ModeRecherche
+
+        try :
+            Groupe_text = self.canvas.create_text(160, 150, text= Groupe_Name, font=("Machine", 14, 'bold'), fill="Black")
+            Groupe_Selection = Groupe_Selection
+            
+        except Exception as e:
+            Groupe_Selection = 3
+            self.Valeur_Groupe()
+    
+        
+        try :
+            Ordre_text = self.canvas.create_text(400, 150, text= Ordre_Name, font=("Machine", 14, 'bold'), fill="Black")
+            Ordre_Selection = Ordre_Selection
+            
+        except Exception as e:
+            Ordre_Selection = False
+            self.Valeur_Ordre()
+            
+
+        if Ordre_Selection == None or Groupe_Selection == None :
+            Groupe_Selection = 3
+            Ordre_Selection = False
+            self.Valeur_Groupe()
+            self.Valeur_Ordre()
+
+
+        self.canvas.create_text(110, 118, text= "Filtre :", font=("Machine", 14, 'bold'), fill="Black")
+        self.draw_rounded_rectangle(70, 130, 200, 40, 10, color="black")
+        self.draw_rounded_rectangle(310, 130, 200, 40, 10, color="black")
+        
+        ################        #Flêche case Filtre Groupe
+        #Flêche du bas
+        arrow_Groupe_1 = self.canvas.create_line(240, 155, 250, 165, width=2)
+        arrow_Groupe_2 = self.canvas.create_line(260, 155, 250, 165, width=2)
+        Up_Filtre_Groupe = self.canvas.create_rectangle(240, 155, 260 , 165, width=0)
+        self.canvas.tag_bind(Up_Filtre_Groupe, '<Button-1>', self.incremmentation_Groupe)
+        self.canvas.tag_bind(arrow_Groupe_1, '<Button-1>', self.incremmentation_Groupe)
+        self.canvas.tag_bind(arrow_Groupe_2, '<Button-1>', self.incremmentation_Groupe)
+        #Flêche du haut
+        arrow_Groupe_3 = self.canvas.create_line(240, 145, 250, 135, width=2)
+        arrow_Groupe_4 = self.canvas.create_line(260, 145, 250, 135, width=2)
+        Down_Filtre_Groupe = self.canvas.create_rectangle(240, 145, 260 , 135, width=0)
+        self.canvas.tag_bind(Down_Filtre_Groupe, '<Button-1>', self.décrementation_Groupe)
+        self.canvas.tag_bind(arrow_Groupe_3, '<Button-1>', self.décrementation_Groupe)
+        self.canvas.tag_bind(arrow_Groupe_4, '<Button-1>', self.décrementation_Groupe)
+        ################
+
+        ################        #Flêche case Filtre Ordre
+        #Flêche du bas
+        arrow_Ordre_1 = self.canvas.create_line(480, 155, 490, 165, width=2)
+        arrow_Ordre_2 = self.canvas.create_line(500, 155, 490, 165, width=2)
+        Up_Filtre_Ordre = self.canvas.create_rectangle(480, 155, 500 , 165, width=0)
+        self.canvas.tag_bind(Up_Filtre_Ordre, '<Button-1>', self.incrementation_Ordre)
+        self.canvas.tag_bind(arrow_Ordre_1, '<Button-1>', self.incrementation_Ordre)
+        self.canvas.tag_bind(arrow_Ordre_2, '<Button-1>', self.incrementation_Ordre)
+        #Flêche du haut
+        arrow_Ordre_3 = self.canvas.create_line(480, 145, 490, 135, width=2)
+        arrow_Ordre_4 = self.canvas.create_line(500, 145, 490, 135, width=2)
+        Down_Filtre_Ordre = self.canvas.create_rectangle(480, 145, 500 , 135, width=0)
+        self.canvas.tag_bind(Down_Filtre_Ordre, '<Button-1>', self.incrementation_Ordre)
+        self.canvas.tag_bind(arrow_Ordre_3, '<Button-1>', self.incrementation_Ordre)
+        self.canvas.tag_bind(arrow_Ordre_4, '<Button-1>', self.incrementation_Ordre)
+        ################
+
+        ################           # Bouton OK
+        self.draw_rounded_rectangle(550, 130, 50, 40, 10, color="black")
+        Bottum_Ok_2 = self.canvas.create_text(575, 150, text= "OK", font=("Machine", 14, 'bold'), fill="Black")
+        Bottum_Ok_1 = self.canvas.create_rectangle(550, 130, 600 , 170, width=0)
+        self.canvas.tag_bind(Bottum_Ok_1, '<Button-1>', self.activation_Filtre)
+        self.canvas.tag_bind(Bottum_Ok_2, '<Button-1>', self.activation_Filtre)
+        ################
+
+        ################################################################################################################ Selection de page
+        if ModeRecherche == False :             # nombre de page si pas de recherche
+            NbrPage = math.ceil(NbrItem / 8)
+        else :                                  # nombre de pas si recherche
+            NbrPage = math.ceil(NbrItemFiltre / 8)
+
+        self.draw_rounded_rectangle(1700, 130, 50, 40, 10, color="black")
+        self.canvas.create_line(1770, 170, 1780, 130, width=4)
+        self.canvas.create_text(1800, 150, text= NbrPage, font=("Machine", 20, 'bold'), fill="Black")
+        text_PageActuel = self.canvas.create_text(1725, 150, text= PageActuel, font=("Machine", 20, 'bold'), fill="Black")
+        zone_PageActuel = self.canvas.create_rectangle(1700, 130, 1750 , 170, width=0)
+        self.canvas.tag_bind(zone_PageActuel, '<Button-1>', self.Modification_Page)
+        ################################################################################################################ Barre de recherche
+
+        x1, y1 = 810, 130
+        x2, y2 = 1110, 170
+        self.draw_rounded_rectangle(810, 130, 300, 40, 10, color="black")
+    
+        # Dessiner la loupe à l'intérieur du rectangle
+        loupe_x = x1 + 20  # Décaler légèrement vers la droite pour centrer
+        loupe_y = y1 + (y2 - y1) // 2  # Centrer verticalement
+        icon_loupe_1 = self.canvas.create_oval(loupe_x, (loupe_y - 10) , loupe_x + 15, (loupe_y - 10) + 15, outline="black", width=3)
+        icon_loupe_2 = self.canvas.create_line(loupe_x + 2 , (loupe_y - 10) + 11  , loupe_x - 10, (loupe_y - 10) + 20 , fill="black", width=3)
+        icon_loupe = self.canvas.create_rectangle(loupe_x - 10, (loupe_y - 10), loupe_x + 15 , (loupe_y - 10) + 20, width=0)
+        self.RechercheBar = Entry(font=("Machine", 20, 'bold'), fg="black",bd = 0, border= 0, highlightthickness=0)
+        self.RechercheBar.place(x= loupe_x + 25, y = y1 + 5, height= 30, width= 250)
+        self.canvas.tag_bind(icon_loupe_1, '<Button-1>', self.Save_recherche_page)
+        self.canvas.tag_bind(icon_loupe_2, '<Button-1>', self.Save_recherche_page)
+        self.canvas.tag_bind(icon_loupe, '<Button-1>', self.Save_recherche_page)
+        self.RechercheBar.bind("<Return>", self.Save_recherche_page)
+
+    def Save_recherche_page(self, event):
+        
+        global stock_info_list
+        global filtered_list
+
+        filtered_list = []
+        search_term  = self.RechercheBar.get()
+
+        for item in stock_info_list:
+        # Vérifie si le terme de recherche est présent dans le nom ou l'ID du produit
+            if (search_term.lower() in item['name'].lower()) or (search_term.lower() in str(item['Stockage_id'])):
+                filtered_list.append(item)
+        
+        if filtered_list == [] :
+            Text_Erreur_Recherche = self.canvas.create_text(960, 180, text="Pas de résultats", font=("Machine", 12, 'bold'), fill="red")
+            self.canvas.after(2000, lambda: self.canvas.delete(Text_Erreur_Recherche))
+        else:
+            self.canvas.delete("all")
+            self.draw_squares(FiltreRechercheOn= True)
+            self.Bannières()
+            self.top_of_page()
+            self.footer_page()
+        
+
+        
+    def incremmentation_Groupe(self, event):
+        global Groupe_Selection
+        Groupe_Selection = Groupe_Selection + 1
+        if Groupe_Selection > 4 :
+            Groupe_Selection = 1
+        self.Valeur_Groupe()
+    
+    def décrementation_Groupe(self, event):
+        global Groupe_Selection
+        Groupe_Selection = Groupe_Selection - 1
+        if Groupe_Selection < 1 :
+            Groupe_Selection = 4
+        self.Valeur_Groupe()
+    
+    def Valeur_Groupe(self):
+        global Groupe_Selection
+        global Groupe_text
+        global Groupe_Name
+        
+        if Groupe_Selection == 1 :
+            Groupe_Name = "Prix"
+        elif Groupe_Selection == 2 :
+            Groupe_Name = "Alphabétique"
+        elif Groupe_Selection == 3 :
+            Groupe_Name = "ID"
+        elif Groupe_Selection == 4 :
+            Groupe_Name = "Quantité"
+        else :
+            return "Erreur de filtre"
+        try : 
+            self.canvas.delete(Groupe_text)
+            Groupe_text = self.canvas.create_text(160, 150, text= Groupe_Name, font=("Machine", 14, 'bold'), fill="Black")
+        except Exception as e:
+            Groupe_text = self.canvas.create_text(160, 150, text= Groupe_Name, font=("Machine", 14, 'bold'), fill="Black")
+        
+    def incrementation_Ordre(self,event):
+        global Ordre_Selection
+        
+        if Ordre_Selection == False :
+            Ordre_Selection = True
+        
+        elif Ordre_Selection == True :
+             Ordre_Selection = False
+        
+        self.Valeur_Ordre()
+         
+    def Valeur_Ordre(self):
+        global Ordre_Selection
+        global Ordre_Name
+        global Ordre_text
+
+        if Ordre_Selection == False :
+            Ordre_Name = "Décroisant"
+        elif Ordre_Selection == True :
+             Ordre_Name = "Croissant" 
+        try :     
+            self.canvas.delete(Ordre_text)
+            Ordre_text = self.canvas.create_text(400, 150, text= Ordre_Name, font=("Machine", 14, 'bold'), fill="Black")
+        except Exception as e:
+            Ordre_text = self.canvas.create_text(400, 150, text= Ordre_Name, font=("Machine", 14, 'bold'), fill="Black")
+
+    def activation_Filtre(self, event):
+        global Groupe_Selection
+        global Ordre_Selection
+        global stock_info_list
+
+        if Groupe_Selection == 1 :
+            stock_info_list = sorted(stock_info_list, key=lambda k: k['Prix'], reverse= Ordre_Selection)
+        elif Groupe_Selection == 2 :
+            stock_info_list = sorted(stock_info_list, key=lambda k: k['name'], reverse= Ordre_Selection)
+        elif Groupe_Selection == 3 :
+            stock_info_list = sorted(stock_info_list, key=lambda k: k['id'], reverse= Ordre_Selection)
+        elif Groupe_Selection == 4 :
+            stock_info_list = sorted(stock_info_list, key=lambda k: k['quantity'], reverse= Ordre_Selection)
+        print(f"Groupe: {Groupe_Selection}")
+        print(f"Ordre: {Ordre_Selection}")
+
+        self.canvas.delete("all")
+        self.Bannières()
+        self.draw_squares()
+        self.top_of_page()
+        self.footer_page()
+
+    def Modification_Page(self, event):
+        self.ValeurPage = Entry(font=("Machine", 20, 'bold'), fg="black",bd = 0, border= 0, highlightthickness=0)
+        self.ValeurPage.place(x=1705, y = 135, height= 30, width= 40)
+        self.ValeurPage.bind("<Return>", self.Save_modification_page)
+
+    def Save_modification_page(self, event):
+        global NbrPage
+        global text_PageActuel
+        global PageActuel
+
+        Demande_Page_Utilisateur = 0
+
+        valeur = int(self.ValeurPage.get())    
+        if valeur > NbrPage :
+            valeur = NbrPage
+        elif valeur <= 0 :
+            valeur = 1
+        
+        self.canvas.delete(text_PageActuel)
+        text_PageActuel = self.canvas.create_text(1725, 150, text= valeur, font=("Machine", 20, 'bold'), fill="Black")
+        
+        print(Demande_Page_Utilisateur)
+        self.ValeurPage.destroy()
+
+        if valeur == 1 :
+            self.canvas.delete("all")
+            self.Bannières()
+            self.draw_squares()
+            self.top_of_page()
+            self.footer_page()
+        elif valeur > 1 and valeur > PageActuel :
+            self.canvas.delete("all")
+            self.Bannières()
+            self.PageSuivante()
+            self.top_of_page()
+            self.footer_page()
+        elif valeur > 1 and valeur < PageActuel :           # RESTE A FAIRE LE MULTI PAGE (+2 PAGE)
+            self.canvas.delete("all")
+            self.Bannières()
+            self.PagePrecedente()
+            self.top_of_page()
+            self.footer_page()
+
+    def footer_page(self):
+        
+        left_arrow_page_1 = self.canvas.create_line(70, 960, 100, 935, width=5)
+        left_arrow_page_2 = self.canvas.create_line(70, 960, 100, 985, width=5)
+        left_arrow_page_3 = self.canvas.create_line(90, 960, 120, 935, width=5)
+        left_arrow_page_4 = self.canvas.create_line(90, 960, 120, 985, width=5)
+        Left_arrow = self.canvas.create_rectangle(70, 935, 120 , 985, width=0)
+        self.canvas.tag_bind(left_arrow_page_1, '<Button-1>', self.left_arrow_page)
+        self.canvas.tag_bind(left_arrow_page_2, '<Button-1>', self.left_arrow_page)
+        self.canvas.tag_bind(left_arrow_page_3, '<Button-1>', self.left_arrow_page)
+        self.canvas.tag_bind(left_arrow_page_4, '<Button-1>', self.left_arrow_page)
+        self.canvas.tag_bind(Left_arrow, '<Button-1>', self.left_arrow_page)
+        
+        right_arrow_page_1 = self.canvas.create_line(1800, 960, 1770, 935, width=5)
+        right_arrow_page_2 = self.canvas.create_line(1800, 960, 1770, 985, width=5)
+        right_arrow_page_3 = self.canvas.create_line(1780, 960, 1750, 935, width=5)
+        right_arrow_page_4 = self.canvas.create_line(1780, 960, 1750, 985, width=5)
+        right_arrow = self.canvas.create_rectangle(1800, 935, 1750 , 985, width=0)
+        self.canvas.tag_bind(right_arrow_page_1, '<Button-1>', self.right_arrow_page)
+        self.canvas.tag_bind(right_arrow_page_2, '<Button-1>', self.right_arrow_page)
+        self.canvas.tag_bind(right_arrow_page_3, '<Button-1>', self.right_arrow_page)
+        self.canvas.tag_bind(right_arrow_page_4, '<Button-1>', self.right_arrow_page)
+        self.canvas.tag_bind(right_arrow, '<Button-1>', self.right_arrow_page)
+
+    def left_arrow_page(self, event):
+        self.PagePrecedente()
+
+    def right_arrow_page(self, event):
+        self.PageSuivante()
+    ######################################################################################################
+        
+    def open_menu_enter(self,event):
+        global MenuOpen
+        global Menu_rectangle1
+        global Menu_rectangle2
+
+        MenuOpen = True
+        
+
+        self.hover_square2 = self.canvas.create_rectangle(1844, 16, 1907 , 69, outline="black", width=2)                                      # Carré noir sur logo Menu           
+        self.hover_menu = self.canvas.create_rectangle(1662, 78, 1908 , 440, outline="Black", width=2, fill="#33c4ff", stipple="gray50")      # Fond Gris Rectangle
+        self.Bottom_Configuration = self.canvas.create_text(1662 + ((1908 - 1662)/2), 120, text= 'Configuration' , font=('Helvetica', 20, 'bold'), fill='black')
+        self.Bottom_Tableau = self.canvas.create_text(1662 + ((1908 - 1662)/2), 190, text= 'Mode Tableau' , font=('Helvetica', 20, 'bold'), fill='black')
+        self.Bottom_Actualiser = self.canvas.create_text(1662 + ((1908 - 1662)/2), 260, text= 'Actualiser' , font=('Helvetica', 20, 'bold'), fill='black')
+        self.Bottom_Deconnexion = self.canvas.create_text(1662 + ((1908 - 1662)/2), 330, text= 'Déconnexion' , font=('Helvetica', 20, 'bold'), fill='black')
+        self.Bottom_Fermer = self.canvas.create_text(1662 + ((1908 - 1662)/2), 400, text= 'Fermer' , font=('Helvetica', 20, 'bold'), fill='black')
+        Menu_rectangle1 = self.canvas.create_rectangle(1662, 78, 1640 , 440, width=0)
+        Menu_rectangle2 = self.canvas.create_rectangle(1662, 440, 1908 , 460, width=0)
+
+        #Rectancgle sortie du menu
+        self.canvas.tag_bind(Menu_rectangle1, '<Enter>', self.menu_hovered_open)
+        self.canvas.tag_bind(Menu_rectangle1, '<Leave>', self.open_menu_left)
+        #Rectangle sortie du menu
+        self.canvas.tag_bind(Menu_rectangle2, '<Enter>', self.menu_hovered_open)
+        self.canvas.tag_bind(Menu_rectangle2, '<Leave>', self.open_menu_left)
+        #Bouton déconnexion
+        self.canvas.tag_bind(self.Bottom_Deconnexion, '<Button-1>', self.deco)
+        #Bouton actualiser
+        self.canvas.tag_bind(self.Bottom_Actualiser, '<Button-1>', self.actualiser_action)
+        #Bouton Fermer
+        self.canvas.tag_bind(self.Bottom_Fermer, '<Button-1>', self.fermer_action)
+
+
+        self.bind_text_hover_events(self.Bottom_Configuration)
+        self.bind_text_hover_events(self.Bottom_Tableau)
+        self.bind_text_hover_events(self.Bottom_Actualiser)
+        self.bind_text_hover_events(self.Bottom_Deconnexion)
+        self.bind_text_hover_events(self.Bottom_Fermer)
+
+    def bind_text_hover_events(self, text_item):
+        self.canvas.tag_bind(text_item, '<Enter>', lambda event: self.text_hovered_open(event, text_item))
+        self.canvas.tag_bind(text_item, '<Leave>', lambda event: self.text_hovered_open_left(event, text_item))
+
+    def text_hovered_open(self, event, text_item):
+        global text_bbox
+        bbox_text = self.canvas.bbox(text_item)
+        paddingPrice = 10
+        x1, y1, x2, y2 = bbox_text
+        x1 -= paddingPrice
+        y1 -= paddingPrice
+        x2 += paddingPrice
+        y2 += paddingPrice
+        text_bbox = self.canvas.create_rectangle(x1, y1, x2, y2, outline="black", width=2)
+
+    def text_hovered_open_left(self, event, text_item):
+        self.canvas.delete(text_bbox) 
+        
+    def open_menu_hovered(self, event):
+        self.hover_square = self.canvas.create_rectangle(1844, 16, 1907 , 69, outline="black", width=2) # Carré noir sur logo Menu
+
+    def open_menu_left(self, event):
+        global MenuOpen
+        global MenuEnter
+        
+        self.canvas.delete(self.hover_square)
+        
+        if MenuOpen == True and MenuEnter == True:    
+            self.canvas.delete(self.hover_menu)
+            self.canvas.delete(self.hover_square2)
+            self.canvas.delete(Menu_rectangle1)
+            self.canvas.delete(Menu_rectangle2)
+            self.canvas.delete(self.Bottom_Configuration)
+            self.canvas.delete(self.Bottom_Tableau)
+            self.canvas.delete(self.Bottom_Deconnexion)
+            self.canvas.delete(self.Bottom_Fermer)
+            self.canvas.delete(self.Bottom_Actualiser)
+
+
+            MenuOpen = False
+            MenuEnter = False
+
+    def menu_hovered_open(self, event):
+        global MenuEnter
+        print("testsddsd")
+        MenuEnter = True
+
+    def actualiser_action(self, event):
+        global ListingProduction
+        global stock_info_list
+        global NbrItem
+        global Ordre_Selection
+        global Groupe_Selection
+
+        Ordre_Selection = None
+        Groupe_Selection = None
+
+        self.canvas.delete("all")
+        ListingProduction = []                                                                          #Remise à zéro de la liste
+        stock_info_list = []                                                                            #Remise à zéro de la liste
+        
+        ListingProduction = self.product()                                                              #Listing Product
+                                                                                    
+        if ListingProduction:                                                                           #Si la liste de production n'est pas vide
+            for ListingProduction in ListingProduction:                                                 #Boucle pour écrire dans la liste
+                product_name_to_search = ListingProduction.get('name')
+                self.search_product_in_stock_by_name(product_name_to_search)
+        NbrItem = len(stock_info_list)
+        self.Bannières()
+        self.draw_squares()
+        self.top_of_page()
+        self.footer_page()
+
+    def fermer_action (self, event):
+        self.master.destroy()
+    ######################################################################################################
+        
+
+
+class PageDetails(tk.Frame):
+    def __init__(self, master, callback, shared_data):
+        super().__init__(master)
+        self.master = master
+        self.callback = callback
+        self.shared_data = shared_data
+        tk.Label(self, text="C'est la page des détails").pack(pady=10)
+
+        # Bouton pour revenir à la page d'accueil
+        tk.Button(self, text="Retour à l'accueil", command=self.retour_accueil).pack(pady=10)
+
+    def retour_accueil(self):
+        self.callback(Pageconnect, self.shared_data)
+
+class Application(tk.Tk):
+    def __init__(self):
+        super().__init__()
+
+        self.title("PokeFig")
+        self.shared_data = SharedData()
+        self.page_actuelle = None
+
+        self.geometry("1920x1080")  # Taille initiale de la fenêtre
+        self.full_screen = False  # Indicateur du mode plein écran
+
+        # Créer un bouton pour basculer entre le modle plein écran et le mode fenêtré
+        #self.fullscreen_button = tk.Button(self, text="Plein écran", command=self.toggle_fullscreen)
+        #self.fullscreen_button.pack(anchor=tk.NE)
+
+        # Charger la première page
+        self.changer_page(Pageconnect, self.shared_data)
+
+    def changer_page(self, classe_page, shared_data):
+        nouvelle_page = classe_page(self, self.changer_page, shared_data)
+
+        if self.page_actuelle is not None:
+            self.page_actuelle.destroy()
+
+        nouvelle_page.pack(fill=tk.BOTH, expand=True)
+        self.page_actuelle = nouvelle_page
+
+    def toggle_fullscreen(self):
+        if self.full_screen:
+            self.attributes("-fullscreen", False)
+            self.fullscreen_button.config(text="Plein écran")
+        else:
+            self.attributes("-fullscreen", True)
+            self.fullscreen_button.config(text="Fenêtré")
+
+        self.full_screen = not self.full_screen
+
+if __name__ == "__main__":
+    app = Application()
+    app.mainloop()

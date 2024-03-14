@@ -8,9 +8,9 @@
 #======================================================================
 
 import tkinter as tk
-import PIL
-from PIL import Image, ImageTk
-import base64, time, io
+from PIL import Image
+import base64
+import io
 import xmlrpc.client
 
 
@@ -45,9 +45,15 @@ def ShowProductImage(self, models, db, uid, password, product_id):
         if product and product[0].get('image_1920'):
             # Convertir la chaîne d'image base64 en bytes
             image_bytes = base64.b64decode(product[0]['image_1920'])
+            
+            # Créer l'objet PhotoImage à partir des bytes
+            #tk_image = tk.PhotoImage(data=image_bytes)
              # Créer l'objet Image à partir des bytes
-            image = Image.open(io.BytesIO(image_bytes))
-            return image
+            mage = Image.open(io.BytesIO(image_bytes))
+
+            # Afficher l'image dans une fenêtre Tkinter
+            label = tk.Label(self, image= mage)
+            label.pack(padx=10, pady=10)
         else:
             print(f"Le produit avec l'ID {product_id} n'a pas d'image.")
     except Exception as e:
@@ -56,25 +62,6 @@ def ShowProductImage(self, models, db, uid, password, product_id):
 
 
 #-------------------------------------------------------------------
-def getManufOrderToDo(models):
-    fields = ['name', 'date_planned_start', 'product_id', 'product_qty', 'qty_producing', 'state']
-    limit = 10
-    mo_list = models.execute_kw(database, gUid, password,
-        'mrp.production', 'search_read',
-        [[('state', '=', 'confirmed'), ('qty_produced', '!=', 'product_qty')]],
-        {'fields': fields, 'limit': limit}
-    )
-
-    if mo_list:
-        result_text = ""
-        for mo_dico in mo_list:
-            result_text += '----------------------------\n'
-            for k in mo_dico.keys():
-                text = f' - {k} : {mo_dico[k]}\n'
-                result_text += text
-        return result_text
-    else:
-        return "Aucun ordre de fabrication trouvé ou une erreur est survenue."
 
 
 
@@ -82,4 +69,4 @@ def getManufOrderToDo(models):
     
 
 
-#--------------------------------------------------------------------,
+#--------------------------------------------------------------------

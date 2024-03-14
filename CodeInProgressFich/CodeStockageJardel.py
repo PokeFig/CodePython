@@ -23,7 +23,7 @@ password = EnterPassword                                                        
 Email = EnterEmail                                                                                 #Gestion de l'identifiant
 url = f'http://{server_ip}:{server_port}'
 uid = None
-global stock_info_list
+
 
 def ConnectionCheck():                                                                             #Fonction block check Connection serveur Odoo
     global AuthentificationChek
